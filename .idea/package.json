@@ -1,18 +1,14 @@
 {
-  "name": "citadels-server",
+  "name": "citadels-multiplayer",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "시타델 보드게임 온라인 멀티플레이어",
+  "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "express": "^5.2.1",
-    "ws": "^8.20.0"
+    "express": "^4.18.2",
+    "ws": "^8.16.0"
   },
   "engines": {
     "node": ">=18.0.0"

@@ -284,6 +284,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div class="logo-sub">시타델 · 도시를 건설하라</div>
   </div>
 
+  <!-- 서버 연결 상태 표시 (로비) -->
+  <div id="lobbyConnSt" style="width:100%;max-width:420px;padding:8px 14px;border-radius:8px;font-size:12px;text-align:center;background:rgba(212,168,67,.1);border:1px solid rgba(212,168,67,.2);color:var(--gold)">
+    🔄 서버 연결 중...
+  </div>
+
   <div class="tabs" id="tabs">
     <div class="tab on" data-t="solo">🤖 혼자하기</div>
     <div class="tab" data-t="host">📡 방 만들기</div>
@@ -308,7 +313,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   <div class="tab-panel card hidden" id="t-host">
     <label class="lbl">내 이름</label>
     <input class="inp" id="hostName" placeholder="방장 이름..." maxlength="10">
-    <button class="btn" onclick="doCreateRoom()">📡 방 만들기</button>
+    <button class="btn" id="btnCreateRoom" onclick="doCreateRoom()" disabled style="opacity:.4">📡 방 만들기</button>
   </div>
 
   <!-- 방 참가 -->
@@ -322,13 +327,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <span class="rl-refresh" onclick="refreshRooms()">🔄 새로고침</span>
     </div>
     <div id="roomList" class="room-list">
-      <div class="rl-empty">연결 중...</div>
+      <div class="rl-empty">서버 연결 중...</div>
     </div>
 
     <div class="code-hint">또는 방 코드로 직접 입장</div>
     <input class="inp" id="joinCode" placeholder="방 코드 6자리 입력 (예: ABC123)" maxlength="6"
            style="margin-bottom:10px" oninput="this.value=this.value.toUpperCase()">
-    <button class="btn btn-sm" onclick="doJoinByCode()">🔑 코드로 참가</button>
+    <button class="btn btn-sm" id="btnJoinCode" onclick="doJoinByCode()" disabled style="opacity:.4">🔑 코드로 참가</button>
   </div>
 </div>
 
