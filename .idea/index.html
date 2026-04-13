@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏰 시타델 CITADELS</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="z1">
+
+<!-- NOTIFICATION -->
+<div id="notif"></div>
+
+<!-- ══════════════════════════════════════════
+     LOBBY
+══════════════════════════════════════════ -->
+<div id="screen-lobby" class="z1">
+  <div class="logo">
+    <span class="logo-emoji">🏰</span>
+    <div class="logo-title">CITADELS</div>
+    <div class="logo-sub">시타델 · 도시를 건설하라</div>
+  </div>
+
+  <div class="lobby-tabs" id="lobbyTabs">
+    <div class="lobby-tab active" data-tab="solo">🤖 혼자하기</div>
+    <div class="lobby-tab" data-tab="host">📡 방 만들기</div>
+    <div class="lobby-tab" data-tab="join">🔑 방 참가</div>
+  </div>
+
+  <!-- SOLO -->
+  <div class="lobby-card" id="tab-solo">
+    <label class="lbl">내 이름</label>
+    <input class="inp" id="soloName" placeholder="영주의 이름..." maxlength="10">
+    <label class="lbl">AI 플레이어 수</label>
+    <div class="cnt-row" id="aiCountRow">
+      <button class="cnt-btn" data-n="1">1명</button>
+      <button class="cnt-btn on" data-n="3">3명</button>
+      <button class="cnt-btn" data-n="4">4명</button>
+      <button class="cnt-btn" data-n="5">5명</button>
+    </div>
+    <button class="btn-primary" onclick="startSolo()"><span>⚔️ &nbsp;게임 시작</span></button>
+  </div>
+
+  <!-- HOST -->
+  <div class="lobby-card hidden" id="tab-host">
+    <label class="lbl">내 이름</label>
+    <input class="inp" id="hostName" placeholder="방장 이름..." maxlength="10">
+    <button class="btn-primary" onclick="createRoom()"><span>📡 &nbsp;방 만들기</span></button>
+  </div>
+
+  <!-- JOIN -->
+  <div class="lobby-card hidden" id="tab-join">
+    <label class="lbl">내 이름</label>
+    <input class="inp" id="joinName" placeholder="플레이어 이름..." maxlength="10">
+    <label class="lbl">방 코드 (6자리)</label>
+    <input class="inp inp-big" id="joinCode" placeholder="XXXXXX" maxlength="6"
+           oninput="this.value=this.value.toUpperCase()">
+    <button class="btn-primary" onclick="joinRoom()"><span>🔑 &nbsp;참가하기</span></button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     WAITING ROOM
+══════════════════════════════════════════ -->
+<div id="screen-waiting" class="z1 hidden">
+  <div class="logo" style="margin-bottom:0">
+    <span class="logo-emoji" style="font-size:48px">🏰</span>
+    <div class="logo-title" style="font-size:32px;letter-spacing:6px">대기실</div>
+  </div>
+  <div class="wait-card">
+    <div class="room-code-display">
+      <div class="room-code-label">방 코드 — 친구에게 공유하세요</div>
+      <div class="room-code-val" id="waitRoomCode">------</div>
+      <div class="room-code-copy" onclick="copyCode()">📋 클립보드에 복사</div>
+    </div>
+    <div class="waiting-list" id="waitingList"></div>
+    <div style="margin-bottom:14px">
+      <label class="lbl" style="margin-bottom:6px">AI 추가 (빈 자리 채우기)</label>
+      <div class="cnt-row" id="waitAiRow">
+        <button class="cnt-btn on" data-n="0">없음</button>
+        <button class="cnt-btn" data-n="1">1명</button>
+        <button class="cnt-btn" data-n="2">2명</button>
+        <button class="cnt-btn" data-n="3">3명</button>
+      </div>
+    </div>
+    <div id="waitStartWrap">
+      <button class="btn-primary" onclick="hostStartGame()" id="hostStartBtn">
+        <span>⚔️ &nbsp;게임 시작 (호스트 전용)</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     GAME
+══════════════════════════════════════════ -->
+<div id="screen-game" class="z1 hidden">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-logo">🏰 CITADELS</div>
+    <div class="tb-divider"></div>
+    <div id="tbPhase" class="tb-phase phase-sel">🎭 캐릭터 선택</div>
+    <div class="tb-divider"></div>
+    <div class="tb-info">
+      <span>라운드 <b id="tbRound">1</b></span>
+      <span>덱 <b id="tbDeck">0</b>장</span>
+    </div>
+    <div class="tb-spacer"></div>
+    <div class="tb-mystat">
+      <div class="stat-item">💰 <b id="tbGold">0</b></div>
+      <div class="stat-item">🃏 <b id="tbHand">0</b>장</div>
+      <div class="stat-item">🏛️ <b id="tbCity">0</b>/7</div>
+      <div class="stat-item">⭐ <b id="tbScore">0</b>점</div>
+    </div>
+  </div>
+
+  <!-- TURN ORDER BAR (진행 순서) -->
+  <div class="turn-order-bar" id="turnOrder"></div>
+
+  <!-- LEFT: PLAYERS + FEED -->
+  <div class="panel-left">
+    <div class="panel-sect">참가자</div>
+    <div class="player-list" id="playerList"></div>
+    <div class="feed-wrap">
+      <div class="feed-header">
+        <span class="feed-title">📋 진행 기록</span>
+        <span style="font-size:10px;color:var(--dim)" id="feedCount">0건</span>
+      </div>
+      <div class="feed-list" id="feedList"></div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main-area" id="mainArea"></div>
+
+  <!-- RIGHT: CHAR LIST + OTHER CITIES -->
+  <div class="panel-right">
+    <div class="panel-sect">캐릭터 (1→8번 순서로 행동)</div>
+    <div class="char-list" id="charList"></div>
+    <div class="city-panel" id="cityPanel">
+      <div style="font-family:Cinzel,serif;font-size:9px;letter-spacing:3px;color:var(--dim);padding:0 0 8px">다른 플레이어 도시</div>
+    </div>
+  </div>
+
+  <!-- ACTION BAR -->
+  <div class="action-bar">
+    <div class="ab-label">ACTION</div>
+    <div class="ab-div"></div>
+    <div id="actionBar"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODALS
+══════════════════════════════════════════ -->
+<!-- Card Tooltip -->
+<div id="tooltipModal" class="modal-bg hidden" onclick="closeTooltip()">
+  <div class="modal tt-box" onclick="event.stopPropagation()">
+    <span class="tt-icon" id="ttIcon"></span>
+    <div class="tt-name" id="ttName"></div>
+    <div class="tt-type" id="ttType"></div>
+    <div class="tt-cost">
+      <div class="tt-cost-badge" id="ttCostBadge"></div>
+      <span style="font-size:12px;color:var(--dim)">건설 비용</span>
+    </div>
+    <div class="tt-special hidden" id="ttSpecialBox">
+      <span class="tt-special-lbl">✨ 특수 능력</span>
+      <span id="ttSpecialText"></span>
+    </div>
+    <button onclick="closeTooltip()"
+      style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--dim2);padding:8px 24px;border-radius:8px;cursor:pointer;font-size:13px;font-family:'Noto Sans KR',sans-serif;">
+      닫기
+    </button>
+  </div>
+</div>
+
+<!-- Game Over -->
+<div id="gameOverModal" class="modal-bg hidden">
+  <div class="modal" style="text-align:center">
+    <div class="go-trophy">🏆</div>
+    <div class="go-title">GAME OVER</div>
+    <div class="go-winner" id="goWinner"></div>
+    <ul class="go-scores" id="goScores"></ul>
+    <button class="btn-primary" onclick="backToLobby()" style="max-width:200px;margin:0 auto">
+      <span>🏠 로비로</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════ -->
+<script src="data.js"></script>
+<script src="game.js"></script>
+<script src="render.js"></script>
+<script>
+// ─── 로비 탭 ───
+document.getElementById("lobbyTabs").addEventListener("click", e => {
+  const t = e.target.closest(".lobby-tab"); if (!t) return;
+  document.querySelectorAll(".lobby-tab").forEach(x => x.classList.remove("active"));
+  t.classList.add("active");
+  ["solo","host","join"].forEach(id => document.getElementById("tab-"+id).classList.add("hidden"));
+  document.getElementById("tab-"+t.dataset.tab).classList.remove("hidden");
+});
+
+// ─── AI 수 선택 ───
+document.getElementById("aiCountRow").addEventListener("click", e => {
+  const b = e.target.closest(".cnt-btn"); if (!b) return;
+  AI_COUNT_SOLO = +b.dataset.n;
+  document.querySelectorAll("#aiCountRow .cnt-btn").forEach(x => x.classList.toggle("on", x === b));
+});
+document.getElementById("waitAiRow").addEventListener("click", e => {
+  const b = e.target.closest(".cnt-btn"); if (!b) return;
+  WAIT_AI_COUNT = +b.dataset.n;
+  document.querySelectorAll("#waitAiRow .cnt-btn").forEach(x => x.classList.toggle("on", x === b));
+});
+
+// ─── 솔로 시작 ───
+function startSolo() {
+  const name = document.getElementById("soloName").value.trim() || "영주";
+  MY_ID = uuid(); IS_HOST = true; ROOM_CODE = "LOCAL";
+  const total = 1 + AI_COUNT_SOLO;
+  const players = Array.from({ length: total }, (_, i) => ({
+    id: i === 0 ? MY_ID : uuid(),
+    name: i === 0 ? name : `AI ${i}`,
+    isAI: i !== 0,
+    avatar: AVATARS[i], color: P_COLORS[i],
+  }));
+  launchGame(players);
+}
+
+// ─── 방 만들기 ───
+function createRoom() {
+  const name = document.getElementById("hostName").value.trim() || "호스트";
+  MY_ID = uuid(); IS_HOST = true; ROOM_CODE = shortCode();
+  const room = {
+    code: ROOM_CODE, phase: "waiting", hostId: MY_ID,
+    players: [{ id: MY_ID, name, avatar: AVATARS[0], color: P_COLORS[0], isAI: false }],
+    G: null,
+  };
+  writeRoom(room); initBC();
+  document.getElementById("screen-lobby").classList.add("hidden");
+  document.getElementById("screen-waiting").classList.remove("hidden");
+  document.getElementById("waitRoomCode").textContent = ROOM_CODE;
+  document.getElementById("waitStartWrap").style.display = "block";
+  renderWaitingRoom(room); startPolling();
+}
+
+// ─── 방 참가 ───
+function joinRoom() {
+  const name = document.getElementById("joinName").value.trim() || "플레이어";
+  const code = document.getElementById("joinCode").value.trim().toUpperCase();
+  if (code.length < 4) { notify("방 코드를 입력하세요!", "warn"); return; }
+  MY_ID = uuid(); IS_HOST = false; ROOM_CODE = code;
+  const room = readRoom();
+  if (!room || room.code !== code) { notify("방을 찾을 수 없습니다. 같은 기기에서 탭을 열어 참가하세요.", "bad"); return; }
+  if (room.phase !== "waiting") { notify("이미 게임이 시작된 방입니다.", "bad"); return; }
+  if (room.players.length >= 6) { notify("방이 가득 찼습니다.", "bad"); return; }
+  const idx = room.players.length;
+  room.players.push({ id: MY_ID, name, avatar: AVATARS[idx], color: P_COLORS[idx], isAI: false });
+  writeRoom(room); initBC(); broadcastState();
+  document.getElementById("screen-lobby").classList.add("hidden");
+  document.getElementById("screen-waiting").classList.remove("hidden");
+  document.getElementById("waitRoomCode").textContent = ROOM_CODE;
+  document.getElementById("waitStartWrap").style.display = "none";
+  renderWaitingRoom(room); startPolling();
+}
+
+// ─── 호스트 게임 시작 ───
+function hostStartGame() {
+  const room = readRoom(); if (!room) return;
+  if (room.players.length + WAIT_AI_COUNT < 2) { notify("최소 2명이 필요합니다.", "warn"); return; }
+  for (let i = 0; i < WAIT_AI_COUNT; i++) {
+    const idx = room.players.length; if (idx >= 6) break;
+    room.players.push({ id: uuid(), name: `AI ${i+1}`, avatar: AVATARS[idx], color: P_COLORS[idx], isAI: true });
+  }
+  const G2 = buildInitialG(room.players);
+  room.phase = "game"; room.G = G2;
+  writeRoom(room); broadcastState();
+  G = G2; enterGameScreen(); aiAutoSelect(); render();
+}
+
+function copyCode() {
+  navigator.clipboard?.writeText(ROOM_CODE).then(() => notify("코드 복사됨!", "ok"));
+}
+</script>
+</body>
+</html>
