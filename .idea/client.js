@@ -985,47 +985,88 @@ function rCityPanel(){
   });
 }
 
-// 상대 도시 팝업
+// 상대 도시 — 왼쪽 패널에 인라인으로 표시 (모달 X)
+let _ecPi = null; // 현재 열린 플레이어 idx
+
 function openEnemyCity(pi){
-  const p=G.players[pi]; if(!p)return;
-  const score=calcScore(p);
-  $('ecmTitle').innerHTML=`${p.avatar} ${esc(p.name)}의 도시`;
-  $('ecmStats').innerHTML=`
-    <span class="ecm-stat">🏛️ <strong>${p.city.length}/7채</strong></span>
-    <span class="ecm-stat">💰 <strong>${p.gold}개</strong></span>
-    <span class="ecm-stat">🃏 <strong>${p.hand.length}장</strong></span>
-    <span class="ecm-stat">⭐ <strong>${score}점</strong></span>
-    ${p.complete?'<span class="ecm-stat" style="color:#7ecca1;font-weight:700">🎉 도시 완성!</span>':''}
-  `;
-  const grid=$('ecmGrid'); grid.innerHTML='';
-  if(!p.city.length){
-    grid.innerHTML='<div style="color:var(--dim);font-size:13px;padding:10px">아직 건설된 건물이 없습니다.</div>';
-  } else {
-    // 색상 그룹핑
-    const groups={yellow:[],blue:[],green:[],red:[],purple:[]};
-    p.city.forEach(c=>groups[c.color].push(c));
-    const colorOrder=['yellow','blue','green','red','purple'];
-    colorOrder.forEach(color=>{
-      groups[color].forEach(c=>{
-        const card=el('div',`dcard c-${color}`);
-        card.innerHTML=`<div class="dc-ico">${c.icon}</div><div class="dc-nm">${c.name}</div><div class="dc-cost">${c.cost}</div>${c.special?'<div class="dc-sp">✨</div>':''}`;
-        card.onclick=()=>openTT(c);
-        card.style.cursor='pointer';
-        grid.appendChild(card);
-      });
-    });
-    // 색상 보너스 표시
-    const colors=new Set(p.city.map(c=>c.color));
-    if(colors.size>=5){
-      const bonus=el('div','');
-      bonus.style.cssText='width:100%;padding:8px 12px;background:rgba(212,168,67,.1);border:1px solid rgba(212,168,67,.2);border-radius:8px;font-size:12px;color:var(--gold2);text-align:center;margin-top:4px';
-      bonus.textContent='🌈 5색 달성 보너스 +3점!';
-      grid.appendChild(bonus);
-    }
-  }
-  $('enemyCityModal').classList.remove('hidden');
+  // 같은 플레이어 다시 클릭 → 닫기 (토글)
+  if(_ecPi === pi){ closeEnemyCity(); return; }
+  _ecPi = pi;
+  // 플레이어 카드 선택 표시 갱신
+  document.querySelectorAll('#pList .pcard.clickable').forEach(c=>c.style.outline='');
+  const cards = document.querySelectorAll('#pList .pcard');
+  // city-p 패널을 건물 뷰로 교체
+  renderEnemyCityInPanel(pi);
+  // 플레이어 목록에서 해당 카드 테두리 강조
+  rPlayerList();
 }
-function closeEnemyCity(){ $('enemyCityModal').classList.add('hidden'); }
+
+function closeEnemyCity(){
+  _ecPi = null;
+  rCityPanel(); // 기본 도시 목록으로 복원
+  rPlayerList();
+}
+
+function renderEnemyCityInPanel(pi){
+  const p = G.players[pi]; if(!p) return;
+  const panel = $('cityPanel'); if(!panel) return;
+  const score = calcScore(p);
+  const colors = new Set(p.city.map(c=>c.color));
+
+  panel.innerHTML='';
+
+  // 헤더
+  const head = el('div','');
+  head.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06)';
+  head.innerHTML=`
+    <div style="display:flex;align-items:center;gap:6px">
+      <div style="font-size:18px">${p.avatar}</div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:${p.color}">${esc(p.name)}</div>
+        <div style="font-size:10px;color:var(--dim2)">${p.city.length}/7채 · ⭐${score}점</div>
+      </div>
+    </div>
+    <button onclick="closeEnemyCity()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--dim2);width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center">✕</button>
+  `;
+  panel.appendChild(head);
+
+  // 스탯
+  const stats = el('div','');
+  stats.style.cssText='display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;padding:8px;background:rgba(255,255,255,.03);border-radius:7px;border:1px solid rgba(255,255,255,.06)';
+  stats.innerHTML=`
+    <span style="font-size:11px;color:var(--dim2)">💰<strong style="color:var(--text)">${p.gold}</strong></span>
+    <span style="font-size:11px;color:var(--dim2)">🃏<strong style="color:var(--text)">${p.hand.length}장</strong></span>
+    ${p.complete?'<span style="font-size:11px;color:#7ecca1;font-weight:700">🎉완성!</span>':''}
+    ${colors.size>=5?'<span style="font-size:11px;color:var(--gold2)">🌈5색!</span>':''}
+  `;
+  panel.appendChild(stats);
+
+  // 건물 카드 그리드
+  if(!p.city.length){
+    const empty = el('div','');
+    empty.style.cssText='color:var(--dim);font-size:12px;padding:8px 0;text-align:center';
+    empty.textContent='아직 건설된 건물이 없습니다.';
+    panel.appendChild(empty);
+    return;
+  }
+
+  const grid = el('div','');
+  grid.style.cssText='display:flex;flex-wrap:wrap;gap:6px;max-height:220px;overflow-y:auto';
+
+  const colorOrder=['yellow','blue','green','red','purple'];
+  colorOrder.forEach(color=>{
+    p.city.filter(c=>c.color===color).forEach(c=>{
+      const card = el('div',`dcard c-${color}`);
+      card.style.width='72px';
+      card.innerHTML=`<div class="dc-ico">${c.icon}</div><div class="dc-nm">${c.name}</div><div class="dc-cost">${c.cost}</div>${c.special?'<div class="dc-sp">✨</div>':''}`;
+      // 클릭 시 툴팁 (이건 별도 레이어라 OK)
+      card.onclick=()=>openTT(c);
+      card.style.cursor='pointer';
+      grid.appendChild(card);
+    });
+  });
+  panel.appendChild(grid);
+}
 
 // 전체 로그 모달
 function openLogModal(){
@@ -1276,3 +1317,177 @@ document.addEventListener('keydown', e => {
     closeTT();
   }
 });
+
+// ══════════════════════════════════════════════════
+// 🎵 배경음악 (Web Audio API — 서버 파일 불필요)
+// 중세 느낌의 아르페지오 + 드론 음
+// ══════════════════════════════════════════════════
+let _bgmCtx  = null;
+let _bgmOn   = false;
+let _bgmNodes = [];   // 정리용
+let _bgmVol  = 0.18; // 기본 볼륨
+
+function bgmInit(){
+  if(_bgmCtx) return;
+  try {
+    _bgmCtx = new (window.AudioContext || window.webkitAudioContext)();
+  } catch(e){ console.warn('Web Audio 미지원'); }
+}
+
+function bgmStart(){
+  bgmInit();
+  if(!_bgmCtx || _bgmOn) return;
+  _bgmOn = true;
+  _bgmNodes = [];
+
+  const ctx = _bgmCtx;
+  if(ctx.state === 'suspended') ctx.resume();
+
+  const master = ctx.createGain();
+  master.gain.value = _bgmVol;
+  master.connect(ctx.destination);
+  _bgmNodes.push(master);
+
+  // ── 리버브 컨볼버 (간단한 임펄스) ──
+  const rev = ctx.createConvolver();
+  const rLen = ctx.sampleRate * 2;
+  const rBuf = ctx.createBuffer(2, rLen, ctx.sampleRate);
+  for(let ch=0;ch<2;ch++){
+    const d=rBuf.getChannelData(ch);
+    for(let i=0;i<rLen;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/rLen,2.5);
+  }
+  rev.buffer=rBuf;
+  rev.connect(master);
+
+  const dry = ctx.createGain(); dry.gain.value=0.7; dry.connect(master);
+  const wet = ctx.createGain(); wet.gain.value=0.3; wet.connect(rev);
+
+  // ── 드론 베이스 (D2 = 73.4Hz) ──
+  function makeDrone(freq, vol){
+    const osc=ctx.createOscillator();
+    const g=ctx.createGain();
+    osc.type='triangle';
+    osc.frequency.value=freq;
+    g.gain.value=vol;
+    osc.connect(g); g.connect(dry); g.connect(wet);
+    osc.start();
+    _bgmNodes.push(osc,g);
+    return osc;
+  }
+  makeDrone(73.4, 0.04);   // D2
+  makeDrone(110,  0.025);  // A2
+  makeDrone(146.8,0.015);  // D3
+
+  // ── 중세 아르페지오 ──
+  // D 단음계: D E F G A Bb C D
+  const scale = [293.7, 329.6, 349.2, 392.0, 440.0, 466.2, 523.3, 587.3];
+  // 아르페지오 패턴 (인덱스)
+  const patterns = [
+    [0,2,4,2, 1,3,5,3, 0,2,4,6, 2,4,2,0],
+    [4,2,0,2, 5,3,1,3, 4,6,4,2, 0,2,4,2],
+    [0,4,2,5, 1,3,6,4, 2,0,4,2, 3,5,3,1],
+  ];
+
+  let patIdx=0, noteIdx=0;
+  const tempo = 0.38; // 음표 간격(초)
+
+  function scheduleNote(time){
+    const pat = patterns[patIdx % patterns.length];
+    const scaleIdx = pat[noteIdx % pat.length];
+    const freq = scale[scaleIdx % scale.length];
+
+    const osc=ctx.createOscillator();
+    const env=ctx.createGain();
+    osc.type='sine';
+    osc.frequency.value=freq;
+    // 공격-감쇠 엔벨로프
+    env.gain.setValueAtTime(0, time);
+    env.gain.linearRampToValueAtTime(0.12, time+0.04);
+    env.gain.exponentialRampToValueAtTime(0.001, time+tempo*0.9);
+    osc.connect(env); env.connect(dry); env.connect(wet);
+    osc.start(time); osc.stop(time+tempo*0.95);
+    _bgmNodes.push(osc, env);
+
+    noteIdx++;
+    if(noteIdx % pat.length === 0){
+      patIdx++;
+      noteIdx=0;
+    }
+  }
+
+  // 스케줄러
+  let nextTime = ctx.currentTime + 0.1;
+  function tick(){
+    if(!_bgmOn) return;
+    while(nextTime < ctx.currentTime + 0.5){
+      scheduleNote(nextTime);
+      nextTime += tempo;
+    }
+    // 완성됐을 때 축제음 추가
+    if(G && G.players && G.players.some(p=>p.complete) && !_bgmFanfare){
+      _bgmFanfare=true;
+      playFanfare();
+    }
+    setTimeout(tick, 100);
+  }
+  tick();
+
+  updateBgmBtn();
+}
+
+let _bgmFanfare = false;
+
+function playFanfare(){
+  if(!_bgmCtx) return;
+  const ctx = _bgmCtx;
+  const g = ctx.createGain();
+  g.gain.value = _bgmVol * 1.5;
+  g.connect(ctx.destination);
+  // 간단한 팡파르: C E G C
+  [523.3, 659.3, 784.0, 1046.5].forEach((f,i)=>{
+    const o=ctx.createOscillator();
+    o.type='square';
+    o.frequency.value=f;
+    const env=ctx.createGain();
+    const t=ctx.currentTime+i*0.22;
+    env.gain.setValueAtTime(0,t);
+    env.gain.linearRampToValueAtTime(0.08,t+0.05);
+    env.gain.exponentialRampToValueAtTime(0.001,t+0.4);
+    o.connect(env); env.connect(g);
+    o.start(t); o.stop(t+0.45);
+  });
+}
+
+function bgmStop(){
+  _bgmOn = false;
+  _bgmFanfare = false;
+  // 오실레이터만 정지 (gain 노드는 GC에 맡김)
+  _bgmNodes.forEach(n=>{ try{ if(n.stop) n.stop(); n.disconnect(); }catch(_){} });
+  _bgmNodes = [];
+  updateBgmBtn();
+}
+
+function bgmToggle(){
+  bgmInit();
+  if(!_bgmCtx){ notify('이 브라우저는 오디오를 지원하지 않습니다.','warn'); return; }
+  if(_bgmOn) bgmStop(); else bgmStart();
+}
+
+function updateBgmBtn(){
+  const on = _bgmOn;
+  ['bgmBtn','bgmBtnLobby'].forEach(id=>{
+    const btn=$('bgmBtn');
+    if(!btn) return;
+    btn.textContent = on ? '🔇 음악 끄기' : '🎵 음악 켜기';
+    btn.style.color = on ? 'var(--gold2)' : 'var(--dim2)';
+    btn.style.borderColor = on ? 'rgba(212,168,67,.4)' : 'rgba(255,255,255,.1)';
+    btn.style.background = on ? 'rgba(212,168,67,.12)' : 'rgba(255,255,255,.04)';
+  });
+  // 로비 버튼
+  const lb=$('bgmBtnLobby');
+  if(lb) lb.textContent = on ? '🔇 음악 끄기' : '🎵 음악 켜기';
+}
+
+function bgmSetVol(v){
+  _bgmVol = Math.max(0, Math.min(1, v));
+}
