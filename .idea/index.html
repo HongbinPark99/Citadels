@@ -354,6 +354,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .ab-end{background:rgba(76,175,125,.12);border-color:rgba(76,175,125,.3);color:#7ecca1}
 /* 모달 */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:550;backdrop-filter:blur(4px)}
+.tt-modal{z-index:700}
 .modal{background:linear-gradient(145deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:15px;padding:30px;max-width:440px;width:90%;position:relative;overflow:hidden;animation:mi .3s ease-out}
 @keyframes mi{from{opacity:0;transform:scale(.9) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
@@ -551,7 +552,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 </div>
 
 <!-- 카드 툴팁 -->
-<div id="ttModal" class="modal-bg hidden" onclick="closeTT()">
+<div id="ttModal" class="modal-bg tt-modal hidden" onclick="closeTT()">
   <div class="modal tt-box" onclick="event.stopPropagation()">
     <span id="ttIcon" style="font-size:50px;margin-bottom:8px;display:block"></span>
     <div id="ttName" style="font-size:20px;font-weight:800;margin-bottom:3px"></div>

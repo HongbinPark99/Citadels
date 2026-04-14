@@ -798,7 +798,13 @@ function rPlayerList(){
     if(isWarlord)d.onclick=()=>{warlordTpi=i;renderWarlordOverlay(i);};
     else if(isWizSwap)d.onclick=()=>doWizSwap(i);
     else if(!isMe)d.onclick=()=>openEnemyCity(i);
-    const ci=G.phase==='player_turn'&&p.selectedCharacter?p.selectedCharacter.icon:isMe&&p.selectedCharacter?p.selectedCharacter.icon:'❓';
+    // 직업(캐릭터) 아이콘 표시 규칙:
+    // - 나(isMe): 내 캐릭터는 항상 표시
+    // - 다른 사람: 해당 플레이어의 턴이 실제로 됐을 때만(isTurn) 표시
+    // - 그 외(대기 중, 선택 단계 등): ❓ 으로 숨김
+    const ci = isMe && p.selectedCharacter ? p.selectedCharacter.icon
+             : isTurn && p.selectedCharacter ? p.selectedCharacter.icon
+             : '❓';
     const pips=p.city.map(c=>`<div class="pip" style="background:${CCSS[c.color]};border-color:${CCSS[c.color]}55" title="${c.name}"></div>`).join('');
     d.innerHTML=`
       <div class="pc-top">
