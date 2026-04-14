@@ -266,7 +266,7 @@ function renderRoomList(rooms) {
       </div>
       ${full
         ? '<div class="rl-full">가득 참</div>'
-        : `<button class="rl-join" onclick="quickJoin('${r.code}')">입장 →</button>`}
+        : `<button class="rl-join" onclick="tryQuickJoin('${r.code}')">입장 →</button>`}
     `;
     list.appendChild(d);
   });
@@ -277,7 +277,29 @@ function refreshRooms() {
   if(ok) notify('방 목록 갱신','info');
 }
 
-// 방 목록 클릭 입장
+// 방 목록 클릭 입장 (이름 확인 포함)
+function tryQuickJoin(code){
+  const nameInp=$('joinName');
+  const name=(nameInp?.value||'').trim();
+  if(!name){
+    // 이름 입력창 강조 후 포커스
+    if(nameInp){
+      nameInp.style.borderColor='#e05252';
+      nameInp.style.boxShadow='0 0 0 3px rgba(224,82,82,.2)';
+      nameInp.focus();
+      nameInp.placeholder='닉네임을 먼저 입력하세요! ←';
+      setTimeout(()=>{
+        nameInp.style.borderColor='';
+        nameInp.style.boxShadow='';
+        nameInp.placeholder='닉네임을 입력하세요...';
+      },2500);
+    }
+    notify('닉네임을 먼저 입력해주세요!','warn');
+    return;
+  }
+  quickJoin(code);
+}
+
 function quickJoin(code) {
   const name=($('joinName').value||'').trim()||'플레이어';
   MY_ID=uid(); IS_HOST=false;
@@ -309,7 +331,12 @@ function doCreateRoom(){
 }
 
 function doJoinByCode(){
-  const name=($('joinName').value||'').trim()||'플레이어';
+  const nameInp=$('joinName');
+  const name=(nameInp?.value||'').trim();
+  if(!name){
+    if(nameInp){nameInp.style.borderColor='#e05252';nameInp.focus();setTimeout(()=>nameInp.style.borderColor='',2000);}
+    notify('닉네임을 먼저 입력해주세요!','warn');return;
+  }
   const code=($('joinCode').value||'').trim().toUpperCase();
   if(code.length<4){notify('방 코드를 입력하세요!','warn');return;}
   MY_ID=uid();IS_HOST=false;
@@ -745,9 +772,10 @@ function rPlayerList(){
     const isDead=G.assassinTarget!==null&&p.selectedCharacter?.id===G.assassinTarget&&G.phase==='player_turn';
     const isWarlord=pendAbility==='warlord'&&!isMe&&p.city.length>0&&p.city.length<7&&!(p.selectedCharacter?.id===5&&G.assassinTarget!==5);
     const isWizSwap=pendAbility==='wizard'&&wizMode==='swap'&&!isMe;
-    const d=el('div','pcard'+(isMe?' me':'')+(isTurn?' active':'')+(isDead?' dead':'')+(isWarlord||isWizSwap?' tsel':''));
+    const d=el('div','pcard'+(isMe?' me':'')+(isTurn?' active':'')+(isDead?' dead':'')+(isWarlord||isWizSwap?' tsel':(!isMe?' clickable':'')));
     if(isWarlord)d.onclick=()=>{warlordTpi=i;renderWarlordOverlay(i);};
-    if(isWizSwap)d.onclick=()=>doWizSwap(i);
+    else if(isWizSwap)d.onclick=()=>doWizSwap(i);
+    else if(!isMe)d.onclick=()=>openEnemyCity(i);
     const ci=G.phase==='player_turn'&&p.selectedCharacter?p.selectedCharacter.icon:isMe&&p.selectedCharacter?p.selectedCharacter.icon:'❓';
     const pips=p.city.map(c=>`<div class="pip" style="background:${CCSS[c.color]};border-color:${CCSS[c.color]}55" title="${c.name}"></div>`).join('');
     d.innerHTML=`
@@ -778,13 +806,23 @@ function rPlayerList(){
   });
 }
 function renderFeed(){
-  const list=$('feedList');list.innerHTML='';if(!G)return;
-  G.log.slice(0,35).forEach(e=>{
-    const d=el('div',`fe ev-${e.type||'system'}`);
-    d.innerHTML=`<span class="fe-i">${e.icon}</span><span class="fe-t">${e.html}</span>`;
-    list.appendChild(d);
+  if(!G)return;
+  renderLogBar();
+}
+
+function renderLogBar(){
+  if(!G)return;
+  const bar=$('logBarInner'); if(!bar)return;
+  bar.innerHTML='';
+  // 위에서 아래로: 최신 항목이 맨 위 (최대 3줄 표시)
+  const visible=G.log.slice(0,3);
+  visible.forEach((e,i)=>{
+    const d=el('div',`log-entry ev-${e.type||'system'}${i===0?' ev-latest':''}`);
+    d.innerHTML=`<span class="log-ico">${e.icon}</span><span class="log-txt">${e.html}</span>`;
+    bar.appendChild(d);
   });
-  $('feedCnt').textContent=`${G.log.length}건`;
+  const cnt=$('logBarCnt');
+  if(cnt)cnt.textContent=`총 ${G.log.length}건`;
 }
 function rMain(){const main=$('mainArea');main.innerHTML='';if(!G)return;if(G.phase==='select_character')rCharSel(main);else rTurnPhase(main);}
 function rCharSel(main){
@@ -916,20 +954,91 @@ function rCharPanel(){
   });
 }
 function rCityPanel(){
-  const panel=$('cityPanel');panel.innerHTML=`<div style="font-size:9px;letter-spacing:2px;color:var(--dim);margin-bottom:6px">다른 플레이어 도시</div>`;
+  const panel=$('cityPanel');
+  panel.innerHTML=`<div style="font-size:9px;letter-spacing:2px;color:var(--dim);margin-bottom:6px">다른 플레이어 도시</div>`;
   const mi=myIdx();
-  G.players.filter((_,i)=>i!==mi).forEach(p=>{
-    if(!p.city.length)return;
+  G.players.filter((_,i)=>i!==mi).forEach((p,_,arr)=>{
+    const pi=G.players.indexOf(p);
+    const score=calcScore(p);
     const row=el('div','cpr');
-    row.innerHTML=`<div class="cpr-name">${p.avatar} ${esc(p.name)} <span style="color:var(--dim)">(${p.city.length}/7) ⭐${calcScore(p)}</span></div>`;
-    const pips=el('div','cpips');
-    p.city.forEach(c=>{
-      const pip=el('div','cpi');pip.style.cssText=`background:${CCSS[c.color]}22;border-color:${CCSS[c.color]}66;color:${CCSS[c.color]};`;
-      pip.innerHTML=`${c.icon}<span>${c.name}</span>`;pip.onclick=()=>openTT(c);pips.appendChild(pip);
-    });
-    row.appendChild(pips);panel.appendChild(row);
+    // 이름 클릭 → 건물 팝업
+    const nameBtn=el('div','cpr-name');
+    nameBtn.style.cssText='cursor:pointer;display:flex;align-items:center;gap:4px;padding:3px 6px;border-radius:6px;transition:.15s;margin:-3px -6px 4px';
+    nameBtn.onmouseover=()=>nameBtn.style.background='rgba(212,168,67,.08)';
+    nameBtn.onmouseout=()=>nameBtn.style.background='';
+    nameBtn.innerHTML=`${p.avatar} <span style="font-weight:700">${esc(p.name)}</span> <span style="color:var(--dim)">(${p.city.length}/7)</span> <span style="color:var(--gold2);font-weight:700">⭐${score}</span> <span style="color:var(--dim);font-size:8px;margin-left:auto">🔍 보기</span>`;
+    nameBtn.onclick=()=>openEnemyCity(pi);
+    row.appendChild(nameBtn);
+
+    if(p.city.length){
+      const pips=el('div','cpips');
+      p.city.slice(0,6).forEach(c=>{
+        const pip=el('div','cpi');pip.style.cssText=`background:${CCSS[c.color]}22;border-color:${CCSS[c.color]}66;color:${CCSS[c.color]};`;
+        pip.innerHTML=`${c.icon}<span>${c.name}</span>`;pip.onclick=()=>openTT(c);pips.appendChild(pip);
+      });
+      if(p.city.length>6){const more=el('div','cpi');more.style.cssText='background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1);color:var(--dim);cursor:pointer;';more.textContent=`+${p.city.length-6}`;more.onclick=()=>openEnemyCity(pi);pips.appendChild(more);}
+      row.appendChild(pips);
+    } else {
+      const empty=el('div','');empty.style.cssText='font-size:10px;color:var(--dim);padding:2px 0';empty.textContent='건물 없음';row.appendChild(empty);
+    }
+    panel.appendChild(row);
   });
 }
+
+// 상대 도시 팝업
+function openEnemyCity(pi){
+  const p=G.players[pi]; if(!p)return;
+  const score=calcScore(p);
+  $('ecmTitle').innerHTML=`${p.avatar} ${esc(p.name)}의 도시`;
+  $('ecmStats').innerHTML=`
+    <span class="ecm-stat">🏛️ <strong>${p.city.length}/7채</strong></span>
+    <span class="ecm-stat">💰 <strong>${p.gold}개</strong></span>
+    <span class="ecm-stat">🃏 <strong>${p.hand.length}장</strong></span>
+    <span class="ecm-stat">⭐ <strong>${score}점</strong></span>
+    ${p.complete?'<span class="ecm-stat" style="color:#7ecca1;font-weight:700">🎉 도시 완성!</span>':''}
+  `;
+  const grid=$('ecmGrid'); grid.innerHTML='';
+  if(!p.city.length){
+    grid.innerHTML='<div style="color:var(--dim);font-size:13px;padding:10px">아직 건설된 건물이 없습니다.</div>';
+  } else {
+    // 색상 그룹핑
+    const groups={yellow:[],blue:[],green:[],red:[],purple:[]};
+    p.city.forEach(c=>groups[c.color].push(c));
+    const colorOrder=['yellow','blue','green','red','purple'];
+    colorOrder.forEach(color=>{
+      groups[color].forEach(c=>{
+        const card=el('div',`dcard c-${color}`);
+        card.innerHTML=`<div class="dc-ico">${c.icon}</div><div class="dc-nm">${c.name}</div><div class="dc-cost">${c.cost}</div>${c.special?'<div class="dc-sp">✨</div>':''}`;
+        card.onclick=()=>openTT(c);
+        card.style.cursor='pointer';
+        grid.appendChild(card);
+      });
+    });
+    // 색상 보너스 표시
+    const colors=new Set(p.city.map(c=>c.color));
+    if(colors.size>=5){
+      const bonus=el('div','');
+      bonus.style.cssText='width:100%;padding:8px 12px;background:rgba(212,168,67,.1);border:1px solid rgba(212,168,67,.2);border-radius:8px;font-size:12px;color:var(--gold2);text-align:center;margin-top:4px';
+      bonus.textContent='🌈 5색 달성 보너스 +3점!';
+      grid.appendChild(bonus);
+    }
+  }
+  $('enemyCityModal').classList.remove('hidden');
+}
+function closeEnemyCity(){ $('enemyCityModal').classList.add('hidden'); }
+
+// 전체 로그 모달
+function openLogModal(){
+  if(!G)return;
+  const body=$('logModalBody'); body.innerHTML='';
+  G.log.forEach(e=>{
+    const d=el('div',`log-modal-item ev-${e.type||'system'}`);
+    d.innerHTML=`<span class="lmi-ico">${e.icon}</span><span class="lmi-txt">${e.html}</span>`;
+    body.appendChild(d);
+  });
+  $('logModal').classList.remove('hidden');
+}
+function closeLogModal(){ $('logModal').classList.add('hidden'); }
 function rActionBar(){
   const bar=$('abtns');bar.innerHTML='';if(!G)return;
   if(G.phase==='select_character'){if(!isMyCS()){const w=el('div','ab-wait');w.innerHTML=`<span class="ab-dot"></span> 캐릭터 선택 대기 중...`;bar.appendChild(w);}return;}

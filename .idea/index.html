@@ -156,7 +156,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .conn-err{background:rgba(224,82,82,.15);color:#f08080;border:1px solid rgba(224,82,82,.2);border-radius:7px;padding:7px 12px;font-size:12px;text-align:center;margin-bottom:12px}
 
 /* ══ GAME ══ */
-#screen-game{display:grid;grid-template-columns:230px 1fr 255px;grid-template-rows:48px 38px 1fr 56px;height:100vh;overflow:hidden}
+#screen-game{display:grid;grid-template-columns:230px 1fr 255px;grid-template-rows:48px 38px 72px 1fr 56px;height:100vh;overflow:hidden}
 .topbar{grid-column:1/-1;background:rgba(10,12,20,.97);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 13px;gap:9px;z-index:20}
 .tb-logo{font-size:16px;font-weight:900;color:var(--gold);letter-spacing:3px}
 .tb-div{width:1px;height:20px;background:var(--border)}
@@ -177,11 +177,29 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .to-av{width:17px;height:17px;border-radius:50%;border:1px solid;font-size:10px;display:flex;align-items:center;justify-content:center}
 .to-arr{color:var(--dim);font-size:10px;flex-shrink:0}
 
+/* ── 상단 로그바 ── */
+.log-bar{grid-column:1/-1;background:rgba(8,10,18,.96);border-bottom:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;overflow:hidden;position:relative}
+.log-bar-inner{display:flex;flex-direction:column;gap:0;overflow-y:hidden;flex:1;padding:0}
+.log-entry{display:flex;align-items:center;gap:8px;padding:4px 12px;border-bottom:1px solid rgba(255,255,255,.03);flex-shrink:0;min-height:0}
+.log-entry:last-child{border-bottom:none}
+.log-entry.ev-latest{background:rgba(212,168,67,.06)}
+.log-ico{font-size:13px;flex-shrink:0}
+.log-txt{font-size:11px;color:var(--dim2);line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.log-txt b{color:var(--text)}
+.ev-gold .log-ico{color:#f0c860}.ev-card .log-ico{color:#5b9bd5}
+.ev-build .log-ico{color:#4caf7d}.ev-combat .log-ico{color:#e05252}
+.ev-win .log-ico{color:#f0c860}.ev-system .log-ico{color:var(--gold)}
+.ev-system .log-txt,.ev-win .log-txt{color:var(--text)}
+.log-bar-footer{display:flex;align-items:center;justify-content:space-between;padding:3px 10px;border-top:1px solid rgba(255,255,255,.05);flex-shrink:0;background:rgba(255,255,255,.02)}
+.log-cnt{font-size:9px;color:var(--dim);letter-spacing:1px}
+.log-expand{font-size:10px;color:var(--dim);cursor:pointer;padding:2px 8px;border-radius:5px;transition:.15s;border:1px solid rgba(255,255,255,.07)}
+.log-expand:hover{background:rgba(212,168,67,.1);color:var(--gold);border-color:rgba(212,168,67,.2)}
+
 /* 왼쪽 패널 */
-.p-left{background:rgba(10,12,20,.92);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.p-left{background:rgba(10,12,20,.92);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;grid-row:4}
 .p-sect{padding:7px 11px 5px;font-size:9px;letter-spacing:3px;color:var(--dim);border-bottom:1px solid rgba(255,255,255,.04)}
 .p-list{overflow-y:auto;flex:1;padding:6px}
-.pcard{border-radius:9px;padding:9px 10px;margin-bottom:5px;border:1px solid rgba(255,255,255,.06);background:rgba(20,24,38,.6);transition:.15s;cursor:default}
+.pcard{border-radius:9px;padding:9px 10px;margin-bottom:5px;border:1px solid rgba(255,255,255,.06);background:rgba(20,24,38,.6);transition:.15s;cursor:default}.pcard.clickable{cursor:pointer}.pcard.clickable:hover{border-color:rgba(212,168,67,.25);background:rgba(20,24,38,.85)}
 .pcard.me{border-color:rgba(155,89,182,.35)}
 .pcard.active{border-color:rgba(212,168,67,.5);background:rgba(212,168,67,.06);animation:glow 2s ease-in-out infinite}
 @keyframes glow{0%,100%{box-shadow:0 0 0 rgba(212,168,67,0)}50%{box-shadow:0 0 12px rgba(212,168,67,.15)}}
@@ -214,7 +232,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .ev-system .fe-t,.ev-win .fe-t{color:var(--text)}
 
 /* 메인 */
-.main{overflow-y:auto;padding:13px;display:flex;flex-direction:column;gap:11px}
+.main{overflow-y:auto;padding:13px;display:flex;flex-direction:column;gap:11px;grid-row:4}
 .sect{font-size:10px;letter-spacing:3px;color:var(--gold);display:flex;align-items:center;gap:8px;margin-bottom:7px}
 .sect::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
 .banner{border-radius:10px;padding:11px 15px;display:flex;align-items:center;gap:11px;border:1px solid}
@@ -270,7 +288,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .wo-grid{display:flex;flex-wrap:wrap;gap:7px}
 .wo-cost{position:absolute;bottom:3px;left:50%;transform:translateX(-50%);font-size:8px;background:rgba(224,82,82,.85);color:#fff;padding:1px 5px;border-radius:5px;white-space:nowrap}
 /* 오른쪽 패널 */
-.p-right{background:rgba(10,12,20,.92);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.p-right{background:rgba(10,12,20,.92);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;grid-row:4}
 .cl{overflow-y:auto;flex:1;padding:7px}
 .ci{padding:7px 9px;border-radius:7px;margin-bottom:4px;border:1px solid rgba(255,255,255,.05);transition:.15s}
 .ci.mine{border-color:rgba(212,168,67,.4)!important}
@@ -287,6 +305,28 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .cb-dead{background:rgba(224,82,82,.2);color:#f08080;border-color:rgba(224,82,82,.3)}
 .cb-thf{background:rgba(245,166,35,.2);color:#f5a623;border-color:rgba(245,166,35,.3)}
 .city-p{padding:8px;border-top:1px solid var(--border);max-height:185px;overflow-y:auto}
+/* 상대 건물 상세 팝업 */
+.enemy-city-modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:450;backdrop-filter:blur(3px)}
+.ecm-box{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px;max-width:480px;width:90%;max-height:80vh;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.ecm-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.ecm-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.ecm-title{font-size:14px;font-weight:800;color:var(--gold2)}
+.ecm-close{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--dim2);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+.ecm-close:hover{background:rgba(255,255,255,.12);color:var(--text)}
+.ecm-stats{display:flex;gap:14px;margin-bottom:14px;padding:10px 12px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(255,255,255,.06)}
+.ecm-stat{font-size:12px;color:var(--dim2);display:flex;align-items:center;gap:4px}
+.ecm-stat strong{color:var(--text)}
+.ecm-grid{display:flex;flex-wrap:wrap;gap:8px;overflow-y:auto}
+/* 로그 전체 모달 */
+.log-modal{background:var(--bg2);border:1px solid var(--border);border-radius:14px;width:min(560px,92vw);max-height:80vh;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.log-modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.log-modal-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0}
+.log-modal-body{overflow-y:auto;padding:10px 14px;flex:1}
+.log-modal-item{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.log-modal-item:last-child{border-bottom:none}
+.lmi-ico{font-size:14px;flex-shrink:0;margin-top:2px}
+.lmi-txt{font-size:12px;line-height:1.6;color:var(--dim2)}
+.lmi-txt b{color:var(--text)}
 .cpr{margin-bottom:7px}
 .cpr-name{font-size:10px;color:var(--dim2);margin-bottom:4px;font-weight:700}
 .cpips{display:flex;flex-wrap:wrap;gap:3px}
@@ -328,9 +368,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .go-sc:nth-child(n+2){background:rgba(255,255,255,.04)}
 .go-pts{color:var(--gold2);font-weight:800}
 /* 채팅 */
-.chat-bar{position:fixed;bottom:60px;right:13px;z-index:30;display:flex;gap:5px}
-.chat-inp{width:160px;padding:7px 10px;background:rgba(20,24,38,.95);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:12px;outline:none}
-.chat-send{padding:7px 11px;background:rgba(212,168,67,.18);border:1px solid rgba(212,168,67,.4);border-radius:7px;color:var(--gold2);font-size:11px;cursor:pointer}
+.chat-bar{position:fixed;bottom:64px;right:14px;z-index:30}
+.chat-inner{display:flex;gap:5px;background:rgba(10,12,18,.97);border:1px solid rgba(212,168,67,.25);border-radius:10px;padding:6px;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+.chat-inp{width:180px;padding:7px 10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:var(--text);font-size:12px;outline:none;transition:.15s}
+.chat-inp:focus{border-color:rgba(212,168,67,.4)}
+.chat-send{padding:7px 14px;background:rgba(212,168,67,.2);border:1px solid rgba(212,168,67,.4);border-radius:7px;color:var(--gold2);font-size:11px;font-weight:700;cursor:pointer;transition:.15s;white-space:nowrap}
+.chat-send:hover{background:rgba(212,168,67,.3)}
 /* 알림 */
 #notif{position:fixed;top:90px;left:50%;transform:translateX(-50%) translateY(-10px);padding:8px 20px;border-radius:20px;font-size:12px;font-weight:700;z-index:1000;opacity:0;transition:.22s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,.4)}
 #notif.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -391,8 +434,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
   <!-- 방 참가 -->
   <div class="tab-panel card hidden" id="t-join">
-    <label class="lbl">내 이름</label>
-    <input class="inp" id="joinName" placeholder="플레이어 이름..." maxlength="10">
+    <label class="lbl">내 이름 <span style="color:#f08080;font-size:8px;letter-spacing:1px;margin-left:6px">입력 후 입장하세요</span></label>
+    <input class="inp" id="joinName" placeholder="닉네임을 입력하세요..." maxlength="10">
 
     <!-- 방 목록 -->
     <div class="rl-header">
@@ -461,13 +504,20 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     </div>
   </div>
   <div class="turn-bar" id="turnBar"></div>
+
+  <!-- 상단 로그바 -->
+  <div class="log-bar">
+    <div class="log-bar-inner" id="logBarInner"></div>
+    <div class="log-bar-footer">
+      <span class="log-cnt" id="logBarCnt">0건</span>
+      <span class="log-expand" onclick="openLogModal()">📋 전체 기록 보기</span>
+    </div>
+  </div>
+
   <div class="p-left">
     <div class="p-sect">참가자</div>
     <div class="p-list" id="pList"></div>
-    <div class="feed-wrap">
-      <div class="feed-hdr"><span class="feed-title">📋 기록</span><span style="font-size:9px;color:var(--dim)" id="feedCnt">0건</span></div>
-      <div class="feed-list" id="feedList"></div>
-    </div>
+
   </div>
   <div class="main" id="mainArea"></div>
   <div class="p-right">
@@ -483,8 +533,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 <!-- 채팅 -->
 <div class="chat-bar hidden" id="chatBar">
-  <input class="chat-inp" id="chatInp" placeholder="채팅..." maxlength="40" onkeydown="if(event.key==='Enter')sendChat()">
-  <button class="chat-send" onclick="sendChat()">전송</button>
+  <div class="chat-inner">
+    <input class="chat-inp" id="chatInp" placeholder="💬 채팅 메시지..." maxlength="40" onkeydown="if(event.key==='Enter')sendChat()">
+    <button class="chat-send" onclick="sendChat()">전송</button>
+  </div>
 </div>
 
 <!-- 카드 툴팁 -->
@@ -697,6 +749,30 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
         <div class="cdex-detail" id="distDetail"></div>
       </div>
     </div>
+  </div>
+</div>
+
+
+<!-- 상대 건물 상세 모달 -->
+<div id="enemyCityModal" class="modal-bg hidden" onclick="if(event.target===this)closeEnemyCity()">
+  <div class="ecm-box">
+    <div class="ecm-head">
+      <div class="ecm-title" id="ecmTitle">플레이어의 도시</div>
+      <button class="ecm-close" onclick="closeEnemyCity()">✕</button>
+    </div>
+    <div class="ecm-stats" id="ecmStats"></div>
+    <div class="ecm-grid" id="ecmGrid"></div>
+  </div>
+</div>
+
+<!-- 전체 로그 모달 -->
+<div id="logModal" class="modal-bg hidden" onclick="if(event.target===this)closeLogModal()">
+  <div class="log-modal">
+    <div class="log-modal-head">
+      <div style="font-size:14px;font-weight:800;color:var(--gold2)">📋 전체 진행 기록</div>
+      <button class="ecm-close" onclick="closeLogModal()">✕</button>
+    </div>
+    <div class="log-modal-body" id="logModalBody"></div>
   </div>
 </div>
 

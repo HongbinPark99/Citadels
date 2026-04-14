@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b2f2235f-b26c-46a5-9cf2-39d853487bbf" name="변경" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/public/client.js" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/public/client.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/public/index.html" afterDir="false" />
-    </list>
+    <list default="true" id="b2f2235f-b26c-46a5-9cf2-39d853487bbf" name="변경" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
