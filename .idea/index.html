@@ -2,288 +2,716 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🏰 시타델 CITADELS</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body class="z1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🏰 시타델</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#d4a843;--gold2:#f0c860;--bg:#0a0c14;--bg2:#111520;--bg3:#181d2e;
+  --border:rgba(212,168,67,.2);--text:#e2d5b8;--dim:rgba(226,213,184,.4);--dim2:rgba(226,213,184,.65);
+  --red:#e05252;--blue:#5b9bd5;--green:#4caf7d;--yellow:#d4a017;--purple:#9b59b6;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:system-ui,'Noto Sans KR',sans-serif;user-select:none}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(212,168,67,.25);border-radius:2px}
+.hidden{display:none!important}
+.z{position:relative;z-index:1}
 
-<!-- NOTIFICATION -->
+/* ── 공통 ── */
+.btn{width:100%;padding:14px;background:linear-gradient(135deg,#d4a843,#8a6520);border:none;border-radius:9px;color:#07090f;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(212,168,67,.3)}
+.btn:disabled{opacity:.4;transform:none;cursor:not-allowed}
+.btn-sm{padding:8px 16px;font-size:12px;border-radius:7px;letter-spacing:1px}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--gold);font-size:13px;font-weight:600;padding:10px 20px;border-radius:8px;cursor:pointer;transition:.2s}
+.btn-outline:hover{background:rgba(212,168,67,.1)}
+.inp{width:100%;padding:12px 14px;background:rgba(255,255,255,.05);border:1px solid rgba(212,168,67,.2);border-radius:8px;color:var(--text);font-size:15px;outline:none;transition:.2s;margin-bottom:14px}
+.inp:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,168,67,.1)}
+.inp::placeholder{color:var(--dim)}
+.lbl{font-size:9px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;display:block;margin-bottom:7px}
+.card{background:linear-gradient(145deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:14px;padding:22px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.tag{font-size:9px;padding:2px 7px;border-radius:8px;border:1px solid;font-weight:700}
+.tag-ai{background:rgba(255,255,255,.06);color:var(--dim2);border-color:rgba(255,255,255,.1)}
+.tag-turn{background:rgba(212,168,67,.2);color:var(--gold2);border-color:rgba(212,168,67,.3)}
+.tag-crown{background:rgba(212,160,23,.15);color:#f5d06a;border-color:rgba(212,160,23,.2)}
+.tag-done{background:rgba(76,175,125,.15);color:#7ecca1;border-color:rgba(76,175,125,.2)}
+.tag-dead{background:rgba(224,82,82,.15);color:#f08080;border-color:rgba(224,82,82,.2)}
+.tag-you{background:rgba(155,89,182,.15);color:#c39bd3;border-color:rgba(155,89,182,.2)}
+/* ── 가이드 버튼 ── */
+.guide-btn{flex:1;padding:10px 0;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:9px;color:var(--dim2);font-size:12px;font-weight:700;cursor:pointer;transition:.2s}
+.guide-btn:hover{background:rgba(212,168,67,.12);border-color:rgba(212,168,67,.3);color:var(--gold2)}
+/* ── 가이드 모달 ── */
+.gmodal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;width:min(680px,94vw);max-height:86vh;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.gmodal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.gm-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0}
+.gm-title{font-size:16px;font-weight:800;color:var(--gold2)}
+.gm-close{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--dim2);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:.15s}
+.gm-close:hover{background:rgba(255,255,255,.12);color:var(--text)}
+.gm-tabs{display:flex;gap:6px;padding:12px 22px 0;flex-shrink:0}
+.gm-tab{padding:6px 14px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,.07);color:var(--dim2);transition:.15s;background:rgba(255,255,255,.03)}
+.gm-tab.on{background:rgba(212,168,67,.15);border-color:rgba(212,168,67,.3);color:var(--gold2)}
+.gm-body{overflow-y:auto;padding:16px 22px 22px;flex:1}
+/* 규칙 섹션 */
+.rule-sec{margin-bottom:20px}
+.rule-h{font-size:13px;font-weight:800;color:var(--gold2);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.rule-h::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(212,168,67,.3),transparent)}
+.rule-p{font-size:12px;color:var(--dim2);line-height:1.8;margin-bottom:6px}
+.rule-p b{color:var(--text)}
+.rule-list{padding-left:4px;display:flex;flex-direction:column;gap:5px}
+.rule-item{font-size:12px;color:var(--dim2);line-height:1.7;display:flex;gap:8px}
+.rule-item::before{content:'▸';color:var(--gold);flex-shrink:0}
+.phase-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.phase-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;flex:1;min-width:140px}
+.phase-n{font-size:10px;letter-spacing:2px;color:var(--gold);margin-bottom:4px}
+.phase-t{font-size:12px;font-weight:700;margin-bottom:3px}
+.phase-d{font-size:10px;color:var(--dim2);line-height:1.6}
+/* 점수표 */
+.score-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:6px}
+.score-table th{padding:7px 10px;text-align:left;background:rgba(212,168,67,.08);color:var(--gold2);border-bottom:1px solid rgba(212,168,67,.2);font-size:10px;letter-spacing:1px}
+.score-table td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--dim2);vertical-align:top;line-height:1.6}
+.score-table tr:last-child td{border-bottom:none}
+/* 카드 도감 */
+.cdex-filter{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+.cdex-tag{padding:5px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,.08);color:var(--dim2);background:rgba(255,255,255,.03);transition:.15s}
+.cdex-tag:hover{opacity:.85}
+.cdex-tag.on{opacity:1}
+.cdex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.cdex-card{border-radius:10px;padding:12px 10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+.cdex-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.cdex-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.4)}
+.cdex-card.c-yellow::before{background:linear-gradient(90deg,#b8860b,#f5d06a)}
+.cdex-card.c-blue::before{background:linear-gradient(90deg,#2c5f8a,#5b9bd5)}
+.cdex-card.c-green::before{background:linear-gradient(90deg,#1a5c35,#4caf7d)}
+.cdex-card.c-red::before{background:linear-gradient(90deg,#8a2020,#e05252)}
+.cdex-card.c-purple::before{background:linear-gradient(90deg,#5c2d8a,#9b59b6)}
+.cdex-card.c-char{border-radius:10px}
+.cdex-ico{font-size:28px;margin-bottom:6px}
+.cdex-name{font-size:12px;font-weight:800;margin-bottom:4px}
+.cdex-sub{font-size:9px;color:var(--dim);margin-bottom:6px;letter-spacing:1px}
+.cdex-desc{font-size:10px;color:var(--dim2);line-height:1.6}
+.cdex-cost{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.cdex-badge{display:inline-block;font-size:8px;padding:2px 6px;border-radius:5px;border:1px solid;margin-top:4px}
+/* 카드 상세 패널 */
+.cdex-detail{display:none;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:16px;margin-top:12px;animation:fin .2s ease-out}
+@keyframes fin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.cdex-detail.show{display:block}
+.cdd-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.cdd-ico{font-size:44px}
+.cdd-name{font-size:18px;font-weight:800}
+.cdd-type{font-size:10px;letter-spacing:2px;color:var(--dim);margin-top:2px}
+.cdd-body{font-size:12px;color:var(--dim2);line-height:1.8}
+.cdd-body b{color:var(--text)}
+.cdd-tip{background:rgba(212,168,67,.08);border:1px solid rgba(212,168,67,.15);border-radius:7px;padding:10px 12px;font-size:11px;color:var(--gold2);line-height:1.7;margin-top:10px}
+.cdd-tip::before{content:'💡 전략: ';font-weight:700}
+
+
+/* ══ LOBBY ══ */
+#screen-lobby{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:28px 16px;gap:14px;overflow-y:auto}
+.logo{text-align:center;margin-bottom:4px}
+.logo-ico{font-size:60px;display:block;filter:drop-shadow(0 0 18px rgba(212,168,67,.5));animation:pu 3s ease-in-out infinite}
+@keyframes pu{0%,100%{filter:drop-shadow(0 0 18px rgba(212,168,67,.5))}50%{filter:drop-shadow(0 0 36px rgba(212,168,67,.8))}}
+.logo-title{font-size:44px;font-weight:900;letter-spacing:8px;background:linear-gradient(180deg,#f0c860,#d4a843 50%,#8a6520);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.logo-sub{font-size:11px;letter-spacing:4px;color:var(--dim);margin-top:3px}
+.tabs{display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:11px;overflow:hidden;width:100%;max-width:420px}
+.tab{flex:1;padding:11px 6px;text-align:center;font-size:12px;font-weight:700;cursor:pointer;transition:.2s;color:var(--dim2)}
+.tab.on{background:rgba(212,168,67,.15);color:var(--gold2)}
+.tab-panel{width:100%;max-width:420px}
+.cnt-row{display:flex;gap:5px;margin-bottom:14px}
+.cnt-btn{flex:1;padding:9px 0;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:7px;color:var(--dim);font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
+.cnt-btn.on{background:rgba(212,168,67,.15);border-color:var(--gold);color:var(--gold2)}
+
+/* 방 목록 */
+.rl-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.rl-title{font-size:11px;letter-spacing:2px;color:var(--gold);font-weight:700}
+.rl-refresh{font-size:11px;color:var(--dim);cursor:pointer;padding:4px 8px;border-radius:6px;transition:.2s}
+.rl-refresh:hover{color:var(--gold);background:rgba(212,168,67,.1)}
+.room-list{display:flex;flex-direction:column;gap:8px;max-height:280px;overflow-y:auto;margin-bottom:14px}
+.rl-empty{text-align:center;color:var(--dim);font-size:12px;padding:20px;background:rgba(255,255,255,.03);border-radius:8px;border:1px dashed rgba(255,255,255,.08)}
+.rl-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:11px 14px;display:flex;align-items:center;gap:10px;transition:.2s;cursor:pointer}
+.rl-item:hover{background:rgba(212,168,67,.07);border-color:rgba(212,168,67,.25)}
+.rl-info{flex:1;min-width:0}
+.rl-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rl-meta{font-size:10px;color:var(--dim2);margin-top:3px;display:flex;align-items:center;gap:8px}
+.rl-avatars{display:flex;gap:2px}
+.rl-cnt{font-size:11px;font-weight:700;color:var(--gold2)}
+.rl-join{padding:7px 14px;background:rgba(212,168,67,.15);border:1px solid rgba(212,168,67,.4);border-radius:7px;color:var(--gold2);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:.2s}
+.rl-join:hover{background:rgba(212,168,67,.25)}
+.rl-full{padding:7px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:7px;color:var(--dim);font-size:12px;cursor:not-allowed;flex-shrink:0}
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#4caf7d;animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.code-hint{font-size:10px;color:var(--dim);text-align:center;margin-bottom:10px}
+
+/* ══ WAITING ══ */
+#screen-waiting{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;gap:14px}
+.wait-card{width:100%;max-width:460px}
+.code-box{background:rgba(212,168,67,.08);border:1px solid rgba(212,168,67,.2);border-radius:10px;padding:14px;text-align:center;margin-bottom:16px}
+.code-lbl{font-size:9px;letter-spacing:3px;color:var(--gold);margin-bottom:5px}
+.code-val{font-size:32px;font-weight:900;color:var(--gold2);letter-spacing:10px}
+.code-copy{font-size:10px;color:var(--dim);margin-top:4px;cursor:pointer}
+.code-copy:hover{color:var(--gold)}
+.w-list{margin-bottom:14px;display:flex;flex-direction:column;gap:6px}
+.w-player{display:flex;align-items:center;gap:10px;padding:9px 12px;background:rgba(255,255,255,.04);border-radius:8px;font-size:13px}
+.w-player.host{border:1px solid rgba(212,168,67,.2)}
+.conn-ok{background:rgba(76,175,125,.15);color:#7ecca1;border:1px solid rgba(76,175,125,.2);border-radius:7px;padding:7px 12px;font-size:12px;text-align:center;margin-bottom:12px}
+.conn-ing{background:rgba(212,168,67,.1);color:var(--gold);border:1px solid rgba(212,168,67,.2);border-radius:7px;padding:7px 12px;font-size:12px;text-align:center;margin-bottom:12px}
+.conn-err{background:rgba(224,82,82,.15);color:#f08080;border:1px solid rgba(224,82,82,.2);border-radius:7px;padding:7px 12px;font-size:12px;text-align:center;margin-bottom:12px}
+
+/* ══ GAME ══ */
+#screen-game{display:grid;grid-template-columns:230px 1fr 255px;grid-template-rows:48px 38px 1fr 56px;height:100vh;overflow:hidden}
+.topbar{grid-column:1/-1;background:rgba(10,12,20,.97);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 13px;gap:9px;z-index:20}
+.tb-logo{font-size:16px;font-weight:900;color:var(--gold);letter-spacing:3px}
+.tb-div{width:1px;height:20px;background:var(--border)}
+.tb-phase{font-size:11px;font-weight:700;padding:3px 11px;border-radius:16px;border:1px solid}
+.ph-sel{color:#9b59b6;border-color:rgba(155,89,182,.4);background:rgba(155,89,182,.1)}
+.ph-act{color:var(--gold2);border-color:rgba(212,168,67,.4);background:rgba(212,168,67,.1)}
+.tb-sp{flex:1}
+.tb-stat{display:flex;align-items:center;gap:7px;background:rgba(212,168,67,.07);border:1px solid var(--border);border-radius:7px;padding:4px 11px;font-size:12px}
+.tb-stat span{display:flex;align-items:center;gap:3px}
+
+/* 진행 순서 바 */
+.turn-bar{grid-column:1/-1;background:rgba(10,12,20,.88);border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:5px;padding:0 13px;overflow-x:auto}
+.to-lbl{font-size:9px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;flex-shrink:0;margin-right:3px}
+.to-item{display:flex;align-items:center;gap:3px;padding:3px 7px;border-radius:7px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);flex-shrink:0;font-size:11px;color:var(--dim);transition:.15s}
+.to-item.cur{background:rgba(212,168,67,.12);border-color:rgba(212,168,67,.4);color:var(--gold2);box-shadow:0 0 8px rgba(212,168,67,.15)}
+.to-item.done{opacity:.35}
+.to-item.dead{background:rgba(224,82,82,.1);border-color:rgba(224,82,82,.3);color:#f08080;opacity:.6}
+.to-av{width:17px;height:17px;border-radius:50%;border:1px solid;font-size:10px;display:flex;align-items:center;justify-content:center}
+.to-arr{color:var(--dim);font-size:10px;flex-shrink:0}
+
+/* 왼쪽 패널 */
+.p-left{background:rgba(10,12,20,.92);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.p-sect{padding:7px 11px 5px;font-size:9px;letter-spacing:3px;color:var(--dim);border-bottom:1px solid rgba(255,255,255,.04)}
+.p-list{overflow-y:auto;flex:1;padding:6px}
+.pcard{border-radius:9px;padding:9px 10px;margin-bottom:5px;border:1px solid rgba(255,255,255,.06);background:rgba(20,24,38,.6);transition:.15s;cursor:default}
+.pcard.me{border-color:rgba(155,89,182,.35)}
+.pcard.active{border-color:rgba(212,168,67,.5);background:rgba(212,168,67,.06);animation:glow 2s ease-in-out infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 0 rgba(212,168,67,0)}50%{box-shadow:0 0 12px rgba(212,168,67,.15)}}
+.pcard.dead{opacity:.45}
+.pcard.tsel{cursor:pointer!important;border-color:rgba(224,82,82,.4)!important}
+.pcard.tsel:hover{background:rgba(224,82,82,.08)!important}
+.pc-top{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.pc-av{width:28px;height:28px;border-radius:50%;font-size:14px;display:flex;align-items:center;justify-content:center;border:2px solid transparent;flex-shrink:0}
+.pc-name{font-size:12px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc-tags{display:flex;flex-wrap:wrap;gap:2px;margin-top:1px}
+.pc-char{font-size:16px;flex-shrink:0}
+.pc-stats{display:flex;gap:6px;flex-wrap:wrap}
+.pc-stat{font-size:10px;color:var(--dim);display:flex;align-items:center;gap:2px}
+.pc-stat strong{color:var(--text)}
+.pc-pips{display:flex;flex-wrap:wrap;gap:2px;margin-top:4px}
+.pip{width:8px;height:8px;border-radius:50%;border:1px solid rgba(255,255,255,.15)}
+
+/* 피드 */
+.feed-wrap{border-top:1px solid var(--border);height:195px;display:flex;flex-direction:column}
+.feed-hdr{padding:6px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.04);flex-shrink:0}
+.feed-title{font-size:9px;letter-spacing:2px;color:var(--gold)}
+.feed-list{overflow-y:auto;flex:1;padding:5px 9px}
+.fe{display:flex;align-items:flex-start;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.03);animation:fi .2s ease-out}
+@keyframes fi{from{opacity:0;transform:translateX(-5px)}to{opacity:1;transform:translateX(0)}}
+.fe-i{font-size:12px;flex-shrink:0;margin-top:1px}
+.fe-t{font-size:10px;line-height:1.5;color:var(--dim2)}
+.fe-t b{color:var(--text)}
+.ev-gold .fe-i{color:#f0c860}.ev-card .fe-i{color:#5b9bd5}.ev-build .fe-i{color:#4caf7d}
+.ev-combat .fe-i{color:#e05252}.ev-win .fe-i{color:#f0c860}.ev-system .fe-i{color:var(--gold)}
+.ev-system .fe-t,.ev-win .fe-t{color:var(--text)}
+
+/* 메인 */
+.main{overflow-y:auto;padding:13px;display:flex;flex-direction:column;gap:11px}
+.sect{font-size:10px;letter-spacing:3px;color:var(--gold);display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.sect::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+.banner{border-radius:10px;padding:11px 15px;display:flex;align-items:center;gap:11px;border:1px solid}
+.bn-sel{background:rgba(155,89,182,.08);border-color:rgba(155,89,182,.2)}
+.bn-act{background:rgba(212,168,67,.07);border-color:rgba(212,168,67,.2)}
+.bn-wait{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.07)}
+.bn-ico{font-size:26px;flex-shrink:0}
+.bn-title{font-size:14px;font-weight:700;margin-bottom:2px}
+.bn-desc{font-size:11px;color:var(--dim2);line-height:1.5}
+.my-strip{display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:9px;border:1px solid}
+.hint{background:rgba(224,82,82,.08);border:1px solid rgba(224,82,82,.22);border-radius:8px;padding:9px 13px;font-size:11px;color:#f08080}
+.inc-row{display:flex;gap:8px}
+.inc-btn{flex:1;padding:12px 9px;border-radius:9px;border:1px solid;cursor:pointer;transition:.2s;text-align:center;font-weight:700}
+.inc-btn:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.inc-g{background:rgba(212,168,67,.1);border-color:rgba(212,168,67,.35);color:var(--gold2)}
+.inc-c{background:rgba(91,155,213,.1);border-color:rgba(91,155,213,.35);color:#89c4f4}
+.inc-ico{font-size:24px;margin-bottom:3px}
+.inc-lbl{font-size:11px}
+.inc-sub{font-size:9px;color:var(--dim);margin-top:1px}
+.empty{color:var(--dim);font-size:12px;padding:6px 0}
+.hand-grid{display:flex;flex-wrap:wrap;gap:7px}
+.dcard{width:82px;border-radius:9px;background:var(--bg3);border:1px solid rgba(255,255,255,.07);padding:9px 7px 7px;cursor:pointer;transition:.2s;position:relative;text-align:center;overflow:hidden}
+.dcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.dcard.c-yellow::before{background:linear-gradient(90deg,#b8860b,#f5d06a)}.dcard.c-blue::before{background:linear-gradient(90deg,#2c5f8a,#5b9bd5)}.dcard.c-green::before{background:linear-gradient(90deg,#1a5c35,#4caf7d)}.dcard.c-red::before{background:linear-gradient(90deg,#8a2020,#e05252)}.dcard.c-purple::before{background:linear-gradient(90deg,#5c2d8a,#9b59b6)}
+.dcard:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.14);box-shadow:0 6px 18px rgba(0,0,0,.4)}
+.dcard.sel{transform:translateY(-6px)}
+.dcard.sel.c-yellow{border-color:#d4a017;box-shadow:0 0 12px rgba(212,160,23,.3)}.dcard.sel.c-blue{border-color:#5b9bd5;box-shadow:0 0 12px rgba(91,155,213,.3)}.dcard.sel.c-green{border-color:#4caf7d;box-shadow:0 0 12px rgba(76,175,125,.3)}.dcard.sel.c-red{border-color:#e05252;box-shadow:0 0 12px rgba(224,82,82,.3)}.dcard.sel.c-purple{border-color:#9b59b6;box-shadow:0 0 12px rgba(155,89,182,.3)}
+.dcard.disabled{opacity:.3;cursor:not-allowed;pointer-events:none}
+.dcard.pick{border-color:rgba(212,168,67,.35)}.dcard.pick:hover{border-color:var(--gold2);box-shadow:0 0 12px rgba(212,168,67,.25)}
+.dcard.dsel{border-color:#e05252!important;background:rgba(224,82,82,.09)}
+.dc-ico{font-size:22px;margin-bottom:3px}
+.dc-nm{font-size:9px;font-weight:700}
+.dc-cost{position:absolute;top:5px;right:5px;width:15px;height:15px;border-radius:50%;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.dc-sp{position:absolute;bottom:3px;left:50%;transform:translateX(-50%);font-size:9px;opacity:.5}
+.c-yellow .dc-nm{color:#d4a017}.c-yellow .dc-cost{background:#d4a017;color:#07090f}
+.c-blue   .dc-nm{color:#5b9bd5}.c-blue   .dc-cost{background:#5b9bd5;color:#07090f}
+.c-green  .dc-nm{color:#4caf7d}.c-green  .dc-cost{background:#4caf7d;color:#07090f}
+.c-red    .dc-nm{color:#e05252}.c-red    .dc-cost{background:#e05252;color:#07090f}
+.c-purple .dc-nm{color:#9b59b6}.c-purple .dc-cost{background:#9b59b6;color:#fff}
+.csel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:8px}
+.csel-card{border-radius:10px;border:1px solid;padding:13px 10px;cursor:pointer;transition:.25s;text-align:center;position:relative;overflow:hidden}
+.csel-card:hover{transform:translateY(-4px)}
+.csel-ico{font-size:34px;margin-bottom:6px;display:block}
+.csel-num{font-size:9px;color:var(--dim);margin-bottom:2px}
+.csel-name{font-size:13px;font-weight:800;margin-bottom:5px}
+.csel-ab{font-size:10px;color:var(--dim2);line-height:1.5}
+.wiz-panel{background:rgba(155,89,182,.08);border:1px solid rgba(155,89,182,.25);border-radius:9px;padding:12px;display:flex;flex-direction:column;gap:7px}
+.wiz-title{font-size:10px;color:#c39bd3;letter-spacing:2px;margin-bottom:2px}
+.wiz-btn{padding:10px 13px;border-radius:7px;border:1px solid rgba(155,89,182,.3);background:rgba(155,89,182,.1);color:#c39bd3;font-size:11px;cursor:pointer;text-align:left;transition:.2s;line-height:1.5}
+.wiz-btn:hover{background:rgba(155,89,182,.2);transform:translateX(3px)}
+.wo-wrap{background:rgba(224,82,82,.06);border:1px solid rgba(224,82,82,.22);border-radius:9px;padding:13px}
+.wo-title{font-size:12px;font-weight:700;color:#f08080;margin-bottom:7px}
+.wo-grid{display:flex;flex-wrap:wrap;gap:7px}
+.wo-cost{position:absolute;bottom:3px;left:50%;transform:translateX(-50%);font-size:8px;background:rgba(224,82,82,.85);color:#fff;padding:1px 5px;border-radius:5px;white-space:nowrap}
+/* 오른쪽 패널 */
+.p-right{background:rgba(10,12,20,.92);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.cl{overflow-y:auto;flex:1;padding:7px}
+.ci{padding:7px 9px;border-radius:7px;margin-bottom:4px;border:1px solid rgba(255,255,255,.05);transition:.15s}
+.ci.mine{border-color:rgba(212,168,67,.4)!important}
+.ci.removed{opacity:.2}
+.ci.tmode{cursor:pointer;border-color:rgba(224,82,82,.3)!important}
+.ci.tmode:hover{background:rgba(224,82,82,.08);transform:translateX(2px)}
+.ci-head{display:flex;align-items:center;gap:5px;margin-bottom:2px}
+.ci-num{font-size:9px;color:var(--dim);width:12px}
+.ci-ico{font-size:13px}.ci-name{font-size:11px;font-weight:700}
+.ci-ab{font-size:9px;color:var(--dim);line-height:1.5}
+.ci-badges{display:flex;flex-wrap:wrap;gap:2px;margin-top:2px}
+.cbadge{font-size:8px;padding:1px 5px;border-radius:6px;border:1px solid}
+.cb-mine{background:rgba(212,168,67,.2);color:var(--gold2);border-color:rgba(212,168,67,.3)}
+.cb-dead{background:rgba(224,82,82,.2);color:#f08080;border-color:rgba(224,82,82,.3)}
+.cb-thf{background:rgba(245,166,35,.2);color:#f5a623;border-color:rgba(245,166,35,.3)}
+.city-p{padding:8px;border-top:1px solid var(--border);max-height:185px;overflow-y:auto}
+.cpr{margin-bottom:7px}
+.cpr-name{font-size:10px;color:var(--dim2);margin-bottom:4px;font-weight:700}
+.cpips{display:flex;flex-wrap:wrap;gap:3px}
+.cpi{display:flex;align-items:center;gap:2px;font-size:9px;padding:2px 5px;border-radius:5px;border:1px solid;cursor:pointer}
+.cpi:hover{opacity:.8}
+/* 액션 바 */
+.abar{grid-column:1/-1;background:rgba(10,12,20,.98);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 13px;gap:7px;overflow-x:auto}
+.ab-lbl{font-size:9px;letter-spacing:2px;color:var(--gold);flex-shrink:0}
+.ab-div{width:1px;height:24px;background:var(--border);flex-shrink:0}
+.ab-wait{font-size:11px;color:var(--dim);display:flex;align-items:center;gap:7px}
+.ab-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:blink 1.5s infinite}
+#abtns{display:flex;gap:7px;align-items:center;padding:7px 0;flex-wrap:wrap}
+.ab{padding:8px 13px;border-radius:7px;border:1px solid;font-size:11px;font-weight:700;cursor:pointer;transition:.15s;white-space:nowrap;display:flex;align-items:center;gap:4px;flex-shrink:0}
+.ab:disabled{opacity:.3;cursor:not-allowed}
+.ab:not(:disabled):hover{transform:translateY(-1px)}
+.ab-gold{background:rgba(212,168,67,.1);border-color:rgba(212,168,67,.4);color:var(--gold2)}
+.ab-gold:not(:disabled):hover{background:rgba(212,168,67,.2)}
+.ab-blue{background:rgba(91,155,213,.1);border-color:rgba(91,155,213,.35);color:#89c4f4}
+.ab-green{background:rgba(76,175,125,.1);border-color:rgba(76,175,125,.35);color:#7ecca1}
+.ab-green:not(:disabled):hover{background:rgba(76,175,125,.2)}
+.ab-purple{background:rgba(155,89,182,.1);border-color:rgba(155,89,182,.4);color:#c39bd3}
+.ab-purple:not(:disabled):hover{background:rgba(155,89,182,.2)}
+.ab-dim{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1);color:var(--dim2)}
+.ab-dim:not(:disabled):hover{background:rgba(255,255,255,.08);color:var(--text)}
+.ab-end{background:rgba(76,175,125,.12);border-color:rgba(76,175,125,.3);color:#7ecca1}
+/* 모달 */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:500;backdrop-filter:blur(4px)}
+.modal{background:linear-gradient(145deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:15px;padding:30px;max-width:440px;width:90%;position:relative;overflow:hidden;animation:mi .3s ease-out}
+@keyframes mi{from{opacity:0;transform:scale(.9) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.tt-box{text-align:center}
+.go-trophy{font-size:64px;margin-bottom:9px;animation:ts .6s .2s ease-out both;display:block}
+@keyframes ts{from{transform:rotate(-20deg) scale(.5);opacity:0}to{transform:rotate(0) scale(1);opacity:1}}
+.go-title{font-size:28px;font-weight:900;color:var(--gold);margin-bottom:4px}
+.go-winner{font-size:16px;margin-bottom:18px}
+.go-scores{list-style:none;margin-bottom:22px;width:100%}
+.go-sc{display:flex;justify-content:space-between;align-items:center;padding:8px 13px;border-radius:7px;margin-bottom:4px;font-size:12px}
+.go-sc:nth-child(1){background:rgba(212,168,67,.12);border:1px solid rgba(212,168,67,.2)}
+.go-sc:nth-child(n+2){background:rgba(255,255,255,.04)}
+.go-pts{color:var(--gold2);font-weight:800}
+/* 채팅 */
+.chat-bar{position:fixed;bottom:60px;right:13px;z-index:30;display:flex;gap:5px}
+.chat-inp{width:160px;padding:7px 10px;background:rgba(20,24,38,.95);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:12px;outline:none}
+.chat-send{padding:7px 11px;background:rgba(212,168,67,.18);border:1px solid rgba(212,168,67,.4);border-radius:7px;color:var(--gold2);font-size:11px;cursor:pointer}
+/* 알림 */
+#notif{position:fixed;top:90px;left:50%;transform:translateX(-50%) translateY(-10px);padding:8px 20px;border-radius:20px;font-size:12px;font-weight:700;z-index:1000;opacity:0;transition:.22s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,.4)}
+#notif.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.n-ok{background:rgba(76,175,125,.92);color:#07090f}
+.n-warn{background:rgba(212,168,67,.95);color:#07090f}
+.n-bad{background:rgba(224,82,82,.92);color:#fff}
+.n-info{background:rgba(91,155,213,.92);color:#07090f}
+</style>
+</head>
+<body class="z">
 <div id="notif"></div>
 
-<!-- ══════════════════════════════════════════
-     LOBBY
-══════════════════════════════════════════ -->
-<div id="screen-lobby" class="z1">
+<!-- ══ LOBBY ══ -->
+<div id="screen-lobby">
   <div class="logo">
-    <span class="logo-emoji">🏰</span>
+    <span class="logo-ico">🏰</span>
     <div class="logo-title">CITADELS</div>
     <div class="logo-sub">시타델 · 도시를 건설하라</div>
   </div>
 
-  <div class="lobby-tabs" id="lobbyTabs">
-    <div class="lobby-tab active" data-tab="solo">🤖 혼자하기</div>
-    <div class="lobby-tab" data-tab="host">📡 방 만들기</div>
-    <div class="lobby-tab" data-tab="join">🔑 방 참가</div>
+  <!-- 서버 연결 상태 표시 (로비) -->
+  <div id="lobbyConnSt" style="width:100%;max-width:420px;padding:8px 14px;border-radius:8px;font-size:12px;text-align:center;background:rgba(212,168,67,.1);border:1px solid rgba(212,168,67,.2);color:var(--gold)">
+    🔄 서버 연결 중...
   </div>
 
-  <!-- SOLO -->
-  <div class="lobby-card" id="tab-solo">
+  <!-- 게임 안내 버튼 -->
+  <div style="display:flex;gap:8px;width:100%;max-width:420px">
+    <button class="guide-btn" onclick="openRules()">📖 게임 규칙</button>
+    <button class="guide-btn" onclick="openCards()">🗂️ 카드 도감</button>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <div class="tab on" data-t="solo">🤖 혼자하기</div>
+    <div class="tab" data-t="host">📡 방 만들기</div>
+    <div class="tab" data-t="join">🔍 방 참가</div>
+  </div>
+
+  <!-- 혼자하기 -->
+  <div class="tab-panel card" id="t-solo">
     <label class="lbl">내 이름</label>
     <input class="inp" id="soloName" placeholder="영주의 이름..." maxlength="10">
-    <label class="lbl">AI 플레이어 수</label>
-    <div class="cnt-row" id="aiCountRow">
+    <label class="lbl">AI 수</label>
+    <div class="cnt-row" id="aiRow">
       <button class="cnt-btn" data-n="1">1명</button>
       <button class="cnt-btn on" data-n="3">3명</button>
       <button class="cnt-btn" data-n="4">4명</button>
       <button class="cnt-btn" data-n="5">5명</button>
     </div>
-    <button class="btn-primary" onclick="startSolo()"><span>⚔️ &nbsp;게임 시작</span></button>
+    <button class="btn" onclick="startSolo()">⚔️ 게임 시작</button>
   </div>
 
-  <!-- HOST -->
-  <div class="lobby-card hidden" id="tab-host">
+  <!-- 방 만들기 -->
+  <div class="tab-panel card hidden" id="t-host">
     <label class="lbl">내 이름</label>
     <input class="inp" id="hostName" placeholder="방장 이름..." maxlength="10">
-    <button class="btn-primary" onclick="createRoom()"><span>📡 &nbsp;방 만들기</span></button>
+    <button class="btn" id="btnCreateRoom" onclick="doCreateRoom()" disabled style="opacity:.4">📡 방 만들기</button>
   </div>
 
-  <!-- JOIN -->
-  <div class="lobby-card hidden" id="tab-join">
+  <!-- 방 참가 -->
+  <div class="tab-panel card hidden" id="t-join">
     <label class="lbl">내 이름</label>
     <input class="inp" id="joinName" placeholder="플레이어 이름..." maxlength="10">
-    <label class="lbl">방 코드 (6자리)</label>
-    <input class="inp inp-big" id="joinCode" placeholder="XXXXXX" maxlength="6"
-           oninput="this.value=this.value.toUpperCase()">
-    <button class="btn-primary" onclick="joinRoom()"><span>🔑 &nbsp;참가하기</span></button>
+
+    <!-- 방 목록 -->
+    <div class="rl-header">
+      <span class="rl-title">🏠 열린 방 목록</span>
+      <span class="rl-refresh" onclick="refreshRooms()">🔄 새로고침</span>
+    </div>
+    <div id="roomList" class="room-list">
+      <div class="rl-empty">서버 연결 중...</div>
+    </div>
+
+    <div class="code-hint">또는 방 코드로 직접 입장</div>
+    <input class="inp" id="joinCode" placeholder="방 코드 6자리 입력 (예: ABC123)" maxlength="6"
+           style="margin-bottom:10px" oninput="this.value=this.value.toUpperCase()">
+    <button class="btn btn-sm" id="btnJoinCode" onclick="doJoinByCode()" disabled style="opacity:.4">🔑 코드로 참가</button>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     WAITING ROOM
-══════════════════════════════════════════ -->
-<div id="screen-waiting" class="z1 hidden">
+<!-- ══ WAITING ══ -->
+<div id="screen-waiting" class="hidden" style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;gap:14px">
   <div class="logo" style="margin-bottom:0">
-    <span class="logo-emoji" style="font-size:48px">🏰</span>
-    <div class="logo-title" style="font-size:32px;letter-spacing:6px">대기실</div>
+    <span class="logo-ico" style="font-size:44px">🏰</span>
+    <div class="logo-title" style="font-size:28px;letter-spacing:5px">대기실</div>
   </div>
-  <div class="wait-card">
-    <div class="room-code-display">
-      <div class="room-code-label">방 코드 — 친구에게 공유하세요</div>
-      <div class="room-code-val" id="waitRoomCode">------</div>
-      <div class="room-code-copy" onclick="copyCode()">📋 클립보드에 복사</div>
+  <div class="card wait-card">
+    <div id="connSt" class="conn-ing">🔄 서버 연결 중...</div>
+    <div class="code-box">
+      <div class="code-lbl">방 코드 — 공유하세요</div>
+      <div class="code-val" id="wCode">------</div>
+      <div class="code-copy" onclick="copyCode()">📋 클립보드에 복사</div>
     </div>
-    <div class="waiting-list" id="waitingList"></div>
-    <div style="margin-bottom:14px">
-      <label class="lbl" style="margin-bottom:6px">AI 추가 (빈 자리 채우기)</label>
-      <div class="cnt-row" id="waitAiRow">
+    <div style="font-size:10px;letter-spacing:2px;color:var(--gold);margin-bottom:8px" id="wCount">0명 대기 중</div>
+    <div class="w-list" id="wList"></div>
+    <div id="aiWaitWrap" class="hidden" style="margin-bottom:12px">
+      <label class="lbl" style="margin-bottom:5px">AI 추가</label>
+      <div class="cnt-row" id="wAiRow">
         <button class="cnt-btn on" data-n="0">없음</button>
         <button class="cnt-btn" data-n="1">1명</button>
         <button class="cnt-btn" data-n="2">2명</button>
         <button class="cnt-btn" data-n="3">3명</button>
       </div>
     </div>
-    <div id="waitStartWrap">
-      <button class="btn-primary" onclick="hostStartGame()" id="hostStartBtn">
-        <span>⚔️ &nbsp;게임 시작 (호스트 전용)</span>
-      </button>
+    <div id="hostStartWrap" class="hidden">
+      <button class="btn" onclick="hostStart()">⚔️ 게임 시작 (호스트)</button>
     </div>
+    <p id="waitMsg" style="text-align:center;font-size:12px;color:var(--dim);margin-top:8px">호스트가 시작할 때까지 기다려주세요...</p>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     GAME
-══════════════════════════════════════════ -->
-<div id="screen-game" class="z1 hidden">
-
-  <!-- TOPBAR -->
+<!-- ══ GAME ══ -->
+<div id="screen-game" class="hidden">
   <div class="topbar">
     <div class="tb-logo">🏰 CITADELS</div>
-    <div class="tb-divider"></div>
-    <div id="tbPhase" class="tb-phase phase-sel">🎭 캐릭터 선택</div>
-    <div class="tb-divider"></div>
-    <div class="tb-info">
+    <div class="tb-div"></div>
+    <div id="tbPhase" class="tb-phase ph-sel">🎭 캐릭터 선택</div>
+    <div class="tb-div"></div>
+    <div style="display:flex;gap:12px;font-size:11px;color:var(--dim2)">
       <span>라운드 <b id="tbRound">1</b></span>
-      <span>덱 <b id="tbDeck">0</b>장</span>
+      <span>덱 <b id="tbDeck">0</b></span>
     </div>
-    <div class="tb-spacer"></div>
-    <div class="tb-mystat">
-      <div class="stat-item">💰 <b id="tbGold">0</b></div>
-      <div class="stat-item">🃏 <b id="tbHand">0</b>장</div>
-      <div class="stat-item">🏛️ <b id="tbCity">0</b>/7</div>
-      <div class="stat-item">⭐ <b id="tbScore">0</b>점</div>
+    <div class="tb-sp"></div>
+    <div class="tb-stat">
+      <span>💰<b id="tbGold">0</b></span>
+      <span>🃏<b id="tbHand">0</b></span>
+      <span>🏛️<b id="tbCity">0</b>/7</span>
+      <span>⭐<b id="tbScore">0</b></span>
     </div>
   </div>
-
-  <!-- TURN ORDER BAR (진행 순서) -->
-  <div class="turn-order-bar" id="turnOrder"></div>
-
-  <!-- LEFT: PLAYERS + FEED -->
-  <div class="panel-left">
-    <div class="panel-sect">참가자</div>
-    <div class="player-list" id="playerList"></div>
+  <div class="turn-bar" id="turnBar"></div>
+  <div class="p-left">
+    <div class="p-sect">참가자</div>
+    <div class="p-list" id="pList"></div>
     <div class="feed-wrap">
-      <div class="feed-header">
-        <span class="feed-title">📋 진행 기록</span>
-        <span style="font-size:10px;color:var(--dim)" id="feedCount">0건</span>
-      </div>
+      <div class="feed-hdr"><span class="feed-title">📋 기록</span><span style="font-size:9px;color:var(--dim)" id="feedCnt">0건</span></div>
       <div class="feed-list" id="feedList"></div>
     </div>
   </div>
-
-  <!-- MAIN -->
-  <div class="main-area" id="mainArea"></div>
-
-  <!-- RIGHT: CHAR LIST + OTHER CITIES -->
-  <div class="panel-right">
-    <div class="panel-sect">캐릭터 (1→8번 순서로 행동)</div>
-    <div class="char-list" id="charList"></div>
-    <div class="city-panel" id="cityPanel">
-      <div style="font-family:Cinzel,serif;font-size:9px;letter-spacing:3px;color:var(--dim);padding:0 0 8px">다른 플레이어 도시</div>
-    </div>
+  <div class="main" id="mainArea"></div>
+  <div class="p-right">
+    <div class="p-sect">캐릭터 순서 (1→8)</div>
+    <div class="cl" id="charList"></div>
+    <div class="city-p" id="cityPanel"><div style="font-size:9px;letter-spacing:2px;color:var(--dim);margin-bottom:6px">다른 플레이어 도시</div></div>
   </div>
-
-  <!-- ACTION BAR -->
-  <div class="action-bar">
-    <div class="ab-label">ACTION</div>
-    <div class="ab-div"></div>
-    <div id="actionBar"></div>
+  <div class="abar">
+    <div class="ab-lbl">ACTION</div><div class="ab-div"></div>
+    <div id="abtns"></div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     MODALS
-══════════════════════════════════════════ -->
-<!-- Card Tooltip -->
-<div id="tooltipModal" class="modal-bg hidden" onclick="closeTooltip()">
+<!-- 채팅 -->
+<div class="chat-bar hidden" id="chatBar">
+  <input class="chat-inp" id="chatInp" placeholder="채팅..." maxlength="40" onkeydown="if(event.key==='Enter')sendChat()">
+  <button class="chat-send" onclick="sendChat()">전송</button>
+</div>
+
+<!-- 카드 툴팁 -->
+<div id="ttModal" class="modal-bg hidden" onclick="closeTT()">
   <div class="modal tt-box" onclick="event.stopPropagation()">
-    <span class="tt-icon" id="ttIcon"></span>
-    <div class="tt-name" id="ttName"></div>
-    <div class="tt-type" id="ttType"></div>
-    <div class="tt-cost">
-      <div class="tt-cost-badge" id="ttCostBadge"></div>
-      <span style="font-size:12px;color:var(--dim)">건설 비용</span>
+    <span id="ttIcon" style="font-size:50px;margin-bottom:8px;display:block"></span>
+    <div id="ttName" style="font-size:20px;font-weight:800;margin-bottom:3px"></div>
+    <div id="ttType" style="font-size:9px;letter-spacing:3px;color:var(--dim);margin-bottom:12px"></div>
+    <div style="display:inline-flex;align-items:center;gap:5px;margin-bottom:12px">
+      <div id="ttCB" style="width:30px;height:30px;border-radius:50%;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center"></div>
+      <span style="font-size:11px;color:var(--dim)">건설 비용</span>
     </div>
-    <div class="tt-special hidden" id="ttSpecialBox">
-      <span class="tt-special-lbl">✨ 특수 능력</span>
-      <span id="ttSpecialText"></span>
+    <div class="hidden" id="ttSpBox" style="background:rgba(155,89,182,.1);border:1px solid rgba(155,89,182,.25);border-radius:8px;padding:10px;font-size:11px;color:#c39bd3;line-height:1.7;text-align:left;margin-bottom:13px">
+      <span style="font-size:8px;letter-spacing:2px;color:#9b59b6;display:block;margin-bottom:3px">✨ 특수 능력</span>
+      <span id="ttSpText"></span>
     </div>
-    <button onclick="closeTooltip()"
-      style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--dim2);padding:8px 24px;border-radius:8px;cursor:pointer;font-size:13px;font-family:'Noto Sans KR',sans-serif;">
-      닫기
-    </button>
+    <button onclick="closeTT()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--dim2);padding:7px 20px;border-radius:7px;cursor:pointer;font-size:12px">닫기</button>
   </div>
 </div>
 
-<!-- Game Over -->
-<div id="gameOverModal" class="modal-bg hidden">
+
+<!-- ══ 게임 규칙 모달 ══ -->
+<div id="rulesModal" class="modal-bg hidden" onclick="if(event.target===this)closeRules()">
+  <div class="gmodal">
+    <div class="gm-head">
+      <div class="gm-title">📖 시타델 게임 규칙</div>
+      <button class="gm-close" onclick="closeRules()">✕</button>
+    </div>
+    <div class="gm-tabs" id="ruleTabs">
+      <div class="gm-tab on" data-rt="overview" onclick="switchRuleTab('overview')">개요</div>
+      <div class="gm-tab" data-rt="flow" onclick="switchRuleTab('flow')">진행 방식</div>
+      <div class="gm-tab" data-rt="score" onclick="switchRuleTab('score')">점수 계산</div>
+      <div class="gm-tab" data-rt="tips" onclick="switchRuleTab('tips')">전략 팁</div>
+    </div>
+    <div class="gm-body">
+
+      <!-- 개요 -->
+      <div id="rt-overview">
+        <div class="rule-sec">
+          <div class="rule-h">🎯 목표</div>
+          <p class="rule-p">중세 도시를 건설하는 카드 게임입니다. 누군가 <b>7채 건물</b>을 완성하면 그 라운드가 마지막이 되고, 가장 높은 점수를 획득한 플레이어가 승리합니다.</p>
+        </div>
+        <div class="rule-sec">
+          <div class="rule-h">👥 인원 & 시작</div>
+          <div class="rule-list">
+            <div class="rule-item">2~6명이 플레이합니다</div>
+            <div class="rule-item">각 플레이어는 시작 시 <b>금화 2개</b>와 <b>건물 카드 4장</b>을 받습니다</div>
+            <div class="rule-item">첫 라운드는 무작위로 선(왕관 소지자)을 정합니다</div>
+            <div class="rule-item">캐릭터 카드 8장 중 1장을 무작위 제거(히든 밴)하고 나머지로 진행합니다</div>
+          </div>
+        </div>
+        <div class="rule-sec">
+          <div class="rule-h">🏗️ 건물 카드 색상</div>
+          <div class="phase-row">
+            <div class="phase-box">
+              <div class="phase-n" style="color:#d4a017">🟡 노란색</div>
+              <div class="phase-t">귀족 지구</div>
+              <div class="phase-d">왕이 금화 수입을 받습니다</div>
+            </div>
+            <div class="phase-box">
+              <div class="phase-n" style="color:#5b9bd5">🔵 파란색</div>
+              <div class="phase-t">종교 지구</div>
+              <div class="phase-d">주교가 금화 수입을 받습니다</div>
+            </div>
+            <div class="phase-box">
+              <div class="phase-n" style="color:#4caf7d">🟢 초록색</div>
+              <div class="phase-t">상업 지구</div>
+              <div class="phase-d">상인이 금화 수입을 받습니다</div>
+            </div>
+            <div class="phase-box">
+              <div class="phase-n" style="color:#e05252">🔴 빨간색</div>
+              <div class="phase-t">군사 지구</div>
+              <div class="phase-d">장군이 금화 수입을 받습니다</div>
+            </div>
+            <div class="phase-box">
+              <div class="phase-n" style="color:#9b59b6">🟣 보라색</div>
+              <div class="phase-t">특수 지구</div>
+              <div class="phase-d">건설 시 특수 능력 발동</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 진행 방식 -->
+      <div id="rt-flow" class="hidden">
+        <div class="rule-sec">
+          <div class="rule-h">🔄 라운드 구조</div>
+          <p class="rule-p">매 라운드는 <b>캐릭터 선택 단계</b>와 <b>행동 단계</b>로 나뉩니다.</p>
+          <div class="phase-row" style="flex-direction:column;gap:8px">
+            <div class="phase-box" style="min-width:unset">
+              <div class="phase-n">PHASE 1</div>
+              <div class="phase-t">🎭 캐릭터 선택</div>
+              <div class="phase-d">왕관 소지자부터 시계 방향으로 1명씩 캐릭터를 비밀리에 선택합니다. 선택하지 않은 캐릭터는 제거됩니다.</div>
+            </div>
+            <div class="phase-box" style="min-width:unset">
+              <div class="phase-n">PHASE 2</div>
+              <div class="phase-t">⚔️ 행동 단계</div>
+              <div class="phase-d">1번(암살자)부터 8번(장군) 순서로 각 캐릭터를 호명합니다. 해당 캐릭터를 가진 플레이어가 자신을 공개하고 턴을 진행합니다.</div>
+            </div>
+          </div>
+        </div>
+        <div class="rule-sec">
+          <div class="rule-h">🎲 내 턴에 할 수 있는 것</div>
+          <div class="rule-list">
+            <div class="rule-item"><b>수입 선택 (필수)</b>: 💰 금화 2개를 받거나, 덱에서 카드 2장을 뽑아 1장을 선택합니다</div>
+            <div class="rule-item"><b>캐릭터 능력 사용 (선택)</b>: 내 캐릭터의 고유 능력을 1회 사용할 수 있습니다</div>
+            <div class="rule-item"><b>건물 건설 (선택)</b>: 손패에서 건물 카드 1장을 비용만큼 금화를 내고 건설합니다 (건축가는 최대 3채)</div>
+            <div class="rule-item"><b>색상 수입</b>: 내 캐릭터에 해당하는 색상 건물 수만큼 금화를 추가로 받습니다</div>
+          </div>
+        </div>
+        <div class="rule-sec">
+          <div class="rule-h">🃏 카드 뽑기 규칙</div>
+          <div class="rule-list">
+            <div class="rule-item">기본: 덱에서 2장을 보고 1장만 손에 넣고 나머지는 버립니다</div>
+            <div class="rule-item"><b>도서관</b> 건물 보유 시: 2장 모두 손에 넣습니다</div>
+            <div class="rule-item"><b>천문대</b> 건물 보유 시: 3장을 보고 1장을 선택합니다</div>
+          </div>
+        </div>
+        <div class="rule-sec">
+          <div class="rule-h">🏁 게임 종료 조건</div>
+          <div class="rule-list">
+            <div class="rule-item">누군가 <b>7채</b>의 건물을 완성하면 그 라운드를 끝까지 진행합니다</div>
+            <div class="rule-item">7채를 <b>가장 먼저</b> 완성한 플레이어는 <b>+4점</b> 보너스를 받습니다</div>
+            <div class="rule-item">같은 라운드에 7채를 완성한 다른 플레이어는 <b>+2점</b> 보너스를 받습니다</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 점수 계산 -->
+      <div id="rt-score" class="hidden">
+        <div class="rule-sec">
+          <div class="rule-h">⭐ 점수 계산 방법</div>
+          <table class="score-table">
+            <tr><th>항목</th><th>점수</th></tr>
+            <tr><td>건설된 건물 카드</td><td>카드 비용만큼 점수</td></tr>
+            <tr><td>5가지 색상 모두 보유</td><td>+3점 보너스</td></tr>
+            <tr><td>7채 최초 완성</td><td>+4점 보너스</td></tr>
+            <tr><td>같은 라운드 완성 (2등~)</td><td>+2점 보너스</td></tr>
+            <tr><td>대학교 / 용의 관문 / 마법 학교</td><td>비용 + 추가 3점</td></tr>
+          </table>
+        </div>
+        <div class="rule-sec">
+          <div class="rule-h">💡 점수 예시</div>
+          <p class="rule-p">건물 합계 20점 + 5색 보너스 3점 + 최초 완성 4점 = <b>총 27점</b></p>
+        </div>
+      </div>
+
+      <!-- 전략 팁 -->
+      <div id="rt-tips" class="hidden">
+        <div class="rule-sec">
+          <div class="rule-h">🎯 초보자 추천 전략</div>
+          <div class="rule-list">
+            <div class="rule-item"><b>상인</b>을 자주 선택해 금화를 빠르게 쌓으세요. 초록 건물과 조합하면 강력합니다</div>
+            <div class="rule-item"><b>건축가</b>는 카드 2장 추가 + 3채 건설이 가능해 빠른 완성에 유리합니다</div>
+            <div class="rule-item">같은 색상 건물을 집중 건설하면 해당 캐릭터 선택 시 수입이 늘어납니다</div>
+            <div class="rule-item">5가지 색상 모두 모으면 +3점 보너스! 보라색 건물 1채로도 달성 가능합니다</div>
+          </div>
+        </div>
+        <div class="rule-sec">
+          <div class="rule-h">🔮 심화 전략</div>
+          <div class="rule-list">
+            <div class="rule-item"><b>암살자</b>: 상대가 상인이나 건축가를 선택할 것 같으면 암살해 수입을 막으세요</div>
+            <div class="rule-item"><b>도둑</b>: 금화가 많은 상인을 노리세요. 등장 시 전부 탈취합니다</div>
+            <div class="rule-item"><b>주교</b>: 건물이 많아지면 장군의 파괴를 막기 위해 주교를 선택하세요</div>
+            <div class="rule-item"><b>왕</b>: 다음 라운드 선택 우선권 확보. 노란 건물이 많다면 더욱 효과적</div>
+            <div class="rule-item">상대방이 어떤 캐릭터를 선택할지 예측하는 <b>블러핑</b>이 핵심입니다</div>
+          </div>
+        </div>
+        <div class="rule-sec">
+          <div class="rule-h">⚠️ 주의 사항</div>
+          <div class="rule-list">
+            <div class="rule-item">같은 건물은 도시에 중복 건설 불가입니다</div>
+            <div class="rule-item">암살당한 플레이어는 그 라운드에 아무것도 할 수 없습니다</div>
+            <div class="rule-item">주교가 암살당하면 장군으로부터의 보호가 사라집니다</div>
+            <div class="rule-item">장군은 7채 완성한 플레이어의 건물을 파괴할 수 없습니다</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ 카드 도감 모달 ══ -->
+<div id="cardsModal" class="modal-bg hidden" onclick="if(event.target===this)closeCards()">
+  <div class="gmodal">
+    <div class="gm-head">
+      <div class="gm-title">🗂️ 카드 도감</div>
+      <button class="gm-close" onclick="closeCards()">✕</button>
+    </div>
+    <div class="gm-tabs" id="cardTabs">
+      <div class="gm-tab on" data-ct="chars" onclick="switchCardTab('chars')">🎭 캐릭터 (8종)</div>
+      <div class="gm-tab" data-ct="districts" onclick="switchCardTab('districts')">🏛️ 건물 (29종)</div>
+    </div>
+    <div class="gm-body">
+      <div id="ct-chars">
+        <div class="cdex-grid" id="charDexGrid"></div>
+        <div class="cdex-detail" id="charDetail"></div>
+      </div>
+      <div id="ct-districts" class="hidden">
+        <div class="cdex-filter" id="distFilter">
+          <div class="cdex-tag on" style="background:rgba(212,168,67,.15);border-color:rgba(212,168,67,.3);color:var(--gold2)" data-f="all" onclick="filterDist('all')">전체</div>
+          <div class="cdex-tag" style="--fc:#d4a017" data-f="yellow" onclick="filterDist('yellow')">🟡 귀족</div>
+          <div class="cdex-tag" style="--fc:#5b9bd5" data-f="blue" onclick="filterDist('blue')">🔵 종교</div>
+          <div class="cdex-tag" style="--fc:#4caf7d" data-f="green" onclick="filterDist('green')">🟢 상업</div>
+          <div class="cdex-tag" style="--fc:#e05252" data-f="red" onclick="filterDist('red')">🔴 군사</div>
+          <div class="cdex-tag" style="--fc:#9b59b6" data-f="purple" onclick="filterDist('purple')">🟣 특수</div>
+        </div>
+        <div class="cdex-grid" id="distDexGrid"></div>
+        <div class="cdex-detail" id="distDetail"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 게임 종료 -->
+<div id="goModal" class="modal-bg hidden">
   <div class="modal" style="text-align:center">
-    <div class="go-trophy">🏆</div>
+    <span class="go-trophy">🏆</span>
     <div class="go-title">GAME OVER</div>
     <div class="go-winner" id="goWinner"></div>
     <ul class="go-scores" id="goScores"></ul>
-    <button class="btn-primary" onclick="backToLobby()" style="max-width:200px;margin:0 auto">
-      <span>🏠 로비로</span>
-    </button>
+    <button class="btn btn-sm" onclick="goLobby()" style="max-width:160px;margin:0 auto">🏠 로비로</button>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     SCRIPTS
-══════════════════════════════════════════ -->
 <script src="data.js"></script>
-<script src="game.js"></script>
-<script src="render.js"></script>
-<script>
-// ─── 로비 탭 ───
-document.getElementById("lobbyTabs").addEventListener("click", e => {
-  const t = e.target.closest(".lobby-tab"); if (!t) return;
-  document.querySelectorAll(".lobby-tab").forEach(x => x.classList.remove("active"));
-  t.classList.add("active");
-  ["solo","host","join"].forEach(id => document.getElementById("tab-"+id).classList.add("hidden"));
-  document.getElementById("tab-"+t.dataset.tab).classList.remove("hidden");
-});
-
-// ─── AI 수 선택 ───
-document.getElementById("aiCountRow").addEventListener("click", e => {
-  const b = e.target.closest(".cnt-btn"); if (!b) return;
-  AI_COUNT_SOLO = +b.dataset.n;
-  document.querySelectorAll("#aiCountRow .cnt-btn").forEach(x => x.classList.toggle("on", x === b));
-});
-document.getElementById("waitAiRow").addEventListener("click", e => {
-  const b = e.target.closest(".cnt-btn"); if (!b) return;
-  WAIT_AI_COUNT = +b.dataset.n;
-  document.querySelectorAll("#waitAiRow .cnt-btn").forEach(x => x.classList.toggle("on", x === b));
-});
-
-// ─── 솔로 시작 ───
-function startSolo() {
-  const name = document.getElementById("soloName").value.trim() || "영주";
-  MY_ID = uuid(); IS_HOST = true; ROOM_CODE = "LOCAL";
-  const total = 1 + AI_COUNT_SOLO;
-  const players = Array.from({ length: total }, (_, i) => ({
-    id: i === 0 ? MY_ID : uuid(),
-    name: i === 0 ? name : `AI ${i}`,
-    isAI: i !== 0,
-    avatar: AVATARS[i], color: P_COLORS[i],
-  }));
-  launchGame(players);
-}
-
-// ─── 방 만들기 ───
-function createRoom() {
-  const name = document.getElementById("hostName").value.trim() || "호스트";
-  MY_ID = uuid(); IS_HOST = true; ROOM_CODE = shortCode();
-  const room = {
-    code: ROOM_CODE, phase: "waiting", hostId: MY_ID,
-    players: [{ id: MY_ID, name, avatar: AVATARS[0], color: P_COLORS[0], isAI: false }],
-    G: null,
-  };
-  writeRoom(room); initBC();
-  document.getElementById("screen-lobby").classList.add("hidden");
-  document.getElementById("screen-waiting").classList.remove("hidden");
-  document.getElementById("waitRoomCode").textContent = ROOM_CODE;
-  document.getElementById("waitStartWrap").style.display = "block";
-  renderWaitingRoom(room); startPolling();
-}
-
-// ─── 방 참가 ───
-function joinRoom() {
-  const name = document.getElementById("joinName").value.trim() || "플레이어";
-  const code = document.getElementById("joinCode").value.trim().toUpperCase();
-  if (code.length < 4) { notify("방 코드를 입력하세요!", "warn"); return; }
-  MY_ID = uuid(); IS_HOST = false; ROOM_CODE = code;
-  const room = readRoom();
-  if (!room || room.code !== code) { notify("방을 찾을 수 없습니다. 같은 기기에서 탭을 열어 참가하세요.", "bad"); return; }
-  if (room.phase !== "waiting") { notify("이미 게임이 시작된 방입니다.", "bad"); return; }
-  if (room.players.length >= 6) { notify("방이 가득 찼습니다.", "bad"); return; }
-  const idx = room.players.length;
-  room.players.push({ id: MY_ID, name, avatar: AVATARS[idx], color: P_COLORS[idx], isAI: false });
-  writeRoom(room); initBC(); broadcastState();
-  document.getElementById("screen-lobby").classList.add("hidden");
-  document.getElementById("screen-waiting").classList.remove("hidden");
-  document.getElementById("waitRoomCode").textContent = ROOM_CODE;
-  document.getElementById("waitStartWrap").style.display = "none";
-  renderWaitingRoom(room); startPolling();
-}
-
-// ─── 호스트 게임 시작 ───
-function hostStartGame() {
-  const room = readRoom(); if (!room) return;
-  if (room.players.length + WAIT_AI_COUNT < 2) { notify("최소 2명이 필요합니다.", "warn"); return; }
-  for (let i = 0; i < WAIT_AI_COUNT; i++) {
-    const idx = room.players.length; if (idx >= 6) break;
-    room.players.push({ id: uuid(), name: `AI ${i+1}`, avatar: AVATARS[idx], color: P_COLORS[idx], isAI: true });
-  }
-  const G2 = buildInitialG(room.players);
-  room.phase = "game"; room.G = G2;
-  writeRoom(room); broadcastState();
-  G = G2; enterGameScreen(); aiAutoSelect(); render();
-}
-
-function copyCode() {
-  navigator.clipboard?.writeText(ROOM_CODE).then(() => notify("코드 복사됨!", "ok"));
-}
-</script>
+<script src="client.js"></script>
 </body>
 </html>
