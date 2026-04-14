@@ -36,6 +36,73 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .tag-done{background:rgba(76,175,125,.15);color:#7ecca1;border-color:rgba(76,175,125,.2)}
 .tag-dead{background:rgba(224,82,82,.15);color:#f08080;border-color:rgba(224,82,82,.2)}
 .tag-you{background:rgba(155,89,182,.15);color:#c39bd3;border-color:rgba(155,89,182,.2)}
+/* ── 가이드 버튼 ── */
+.guide-btn{flex:1;padding:10px 0;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:9px;color:var(--dim2);font-size:12px;font-weight:700;cursor:pointer;transition:.2s}
+.guide-btn:hover{background:rgba(212,168,67,.12);border-color:rgba(212,168,67,.3);color:var(--gold2)}
+/* ── 가이드 모달 ── */
+.gmodal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;width:min(680px,94vw);max-height:86vh;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.gmodal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.gm-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0}
+.gm-title{font-size:16px;font-weight:800;color:var(--gold2)}
+.gm-close{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--dim2);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:.15s}
+.gm-close:hover{background:rgba(255,255,255,.12);color:var(--text)}
+.gm-tabs{display:flex;gap:6px;padding:12px 22px 0;flex-shrink:0}
+.gm-tab{padding:6px 14px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,.07);color:var(--dim2);transition:.15s;background:rgba(255,255,255,.03)}
+.gm-tab.on{background:rgba(212,168,67,.15);border-color:rgba(212,168,67,.3);color:var(--gold2)}
+.gm-body{overflow-y:auto;padding:16px 22px 22px;flex:1}
+/* 규칙 섹션 */
+.rule-sec{margin-bottom:20px}
+.rule-h{font-size:13px;font-weight:800;color:var(--gold2);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.rule-h::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(212,168,67,.3),transparent)}
+.rule-p{font-size:12px;color:var(--dim2);line-height:1.8;margin-bottom:6px}
+.rule-p b{color:var(--text)}
+.rule-list{padding-left:4px;display:flex;flex-direction:column;gap:5px}
+.rule-item{font-size:12px;color:var(--dim2);line-height:1.7;display:flex;gap:8px}
+.rule-item::before{content:'▸';color:var(--gold);flex-shrink:0}
+.phase-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.phase-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;flex:1;min-width:140px}
+.phase-n{font-size:10px;letter-spacing:2px;color:var(--gold);margin-bottom:4px}
+.phase-t{font-size:12px;font-weight:700;margin-bottom:3px}
+.phase-d{font-size:10px;color:var(--dim2);line-height:1.6}
+/* 점수표 */
+.score-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:6px}
+.score-table th{padding:7px 10px;text-align:left;background:rgba(212,168,67,.08);color:var(--gold2);border-bottom:1px solid rgba(212,168,67,.2);font-size:10px;letter-spacing:1px}
+.score-table td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--dim2);vertical-align:top;line-height:1.6}
+.score-table tr:last-child td{border-bottom:none}
+/* 카드 도감 */
+.cdex-filter{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+.cdex-tag{padding:5px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,.08);color:var(--dim2);background:rgba(255,255,255,.03);transition:.15s}
+.cdex-tag:hover{opacity:.85}
+.cdex-tag.on{opacity:1}
+.cdex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.cdex-card{border-radius:10px;padding:12px 10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+.cdex-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.cdex-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.4)}
+.cdex-card.c-yellow::before{background:linear-gradient(90deg,#b8860b,#f5d06a)}
+.cdex-card.c-blue::before{background:linear-gradient(90deg,#2c5f8a,#5b9bd5)}
+.cdex-card.c-green::before{background:linear-gradient(90deg,#1a5c35,#4caf7d)}
+.cdex-card.c-red::before{background:linear-gradient(90deg,#8a2020,#e05252)}
+.cdex-card.c-purple::before{background:linear-gradient(90deg,#5c2d8a,#9b59b6)}
+.cdex-card.c-char{border-radius:10px}
+.cdex-ico{font-size:28px;margin-bottom:6px}
+.cdex-name{font-size:12px;font-weight:800;margin-bottom:4px}
+.cdex-sub{font-size:9px;color:var(--dim);margin-bottom:6px;letter-spacing:1px}
+.cdex-desc{font-size:10px;color:var(--dim2);line-height:1.6}
+.cdex-cost{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.cdex-badge{display:inline-block;font-size:8px;padding:2px 6px;border-radius:5px;border:1px solid;margin-top:4px}
+/* 카드 상세 패널 */
+.cdex-detail{display:none;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:16px;margin-top:12px;animation:fin .2s ease-out}
+@keyframes fin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.cdex-detail.show{display:block}
+.cdd-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.cdd-ico{font-size:44px}
+.cdd-name{font-size:18px;font-weight:800}
+.cdd-type{font-size:10px;letter-spacing:2px;color:var(--dim);margin-top:2px}
+.cdd-body{font-size:12px;color:var(--dim2);line-height:1.8}
+.cdd-body b{color:var(--text)}
+.cdd-tip{background:rgba(212,168,67,.08);border:1px solid rgba(212,168,67,.15);border-radius:7px;padding:10px 12px;font-size:11px;color:var(--gold2);line-height:1.7;margin-top:10px}
+.cdd-tip::before{content:'💡 전략: ';font-weight:700}
+
 
 /* ══ LOBBY ══ */
 #screen-lobby{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:28px 16px;gap:14px;overflow-y:auto}
@@ -289,6 +356,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     🔄 서버 연결 중...
   </div>
 
+  <!-- 게임 안내 버튼 -->
+  <div style="display:flex;gap:8px;width:100%;max-width:420px">
+    <button class="guide-btn" onclick="openRules()">📖 게임 규칙</button>
+    <button class="guide-btn" onclick="openCards()">🗂️ 카드 도감</button>
+  </div>
+
   <div class="tabs" id="tabs">
     <div class="tab on" data-t="solo">🤖 혼자하기</div>
     <div class="tab" data-t="host">📡 방 만들기</div>
@@ -429,6 +502,201 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <span id="ttSpText"></span>
     </div>
     <button onclick="closeTT()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--dim2);padding:7px 20px;border-radius:7px;cursor:pointer;font-size:12px">닫기</button>
+  </div>
+</div>
+
+
+<!-- ══ 게임 규칙 모달 ══ -->
+<div id="rulesModal" class="modal-bg hidden" onclick="if(event.target===this)closeRules()">
+  <div class="gmodal">
+    <div class="gm-head">
+      <div class="gm-title">📖 시타델 게임 규칙</div>
+      <button class="gm-close" onclick="closeRules()">✕</button>
+    </div>
+    <div class="gm-tabs" id="ruleTabs">
+      <div class="gm-tab on" data-rt="overview" onclick="switchRuleTab('overview')">개요</div>
+      <div class="gm-tab" data-rt="flow" onclick="switchRuleTab('flow')">진행 방식</div>
+      <div class="gm-tab" data-rt="score" onclick="switchRuleTab('score')">점수 계산</div>
+      <div class="gm-tab" data-rt="tips" onclick="switchRuleTab('tips')">전략 팁</div>
+    </div>
+    <div class="gm-body">
+
+      <!-- 개요 -->
+      <div id="rt-overview">
+        <div class="rule-sec">
+          <div class="rule-h">🎯 목표</div>
+          <p class="rule-p">중세 도시를 건설하는 카드 게임입니다. 누군가 <b>7채 건물</b>을 완성하면 그 라운드가 마지막이 되고, 가장 높은 점수를 획득한 플레이어가 승리합니다.</p>
+        </div>
+        <div class="rule-sec">
+          <div class="rule-h">👥 인원 & 시작</div>
+          <div class="rule-list">
+            <div class="rule-item">2~6명이 플레이합니다</div>
+            <div class="rule-item">각 플레이어는 시작 시 <b>금화 2개</b>와 <b>건물 카드 4장</b>을 받습니다</div>
+            <div class="rule-item">첫 라운드는 무작위로 선(왕관 소지자)을 정합니다</div>
+            <div class="rule-item">캐릭터 카드 8장 중 1장을 무작위 제거(히든 밴)하고 나머지로 진행합니다</div>
+          </div>
+        </div>
+        <div class="rule-sec">
+          <div class="rule-h">🏗️ 건물 카드 색상</div>
+          <div class="phase-row">
+            <div class="phase-box">
+              <div class="phase-n" style="color:#d4a017">🟡 노란색</div>
+              <div class="phase-t">귀족 지구</div>
+              <div class="phase-d">왕이 금화 수입을 받습니다</div>
+            </div>
+            <div class="phase-box">
+              <div class="phase-n" style="color:#5b9bd5">🔵 파란색</div>
+              <div class="phase-t">종교 지구</div>
+              <div class="phase-d">주교가 금화 수입을 받습니다</div>
+            </div>
+            <div class="phase-box">
+              <div class="phase-n" style="color:#4caf7d">🟢 초록색</div>
+              <div class="phase-t">상업 지구</div>
+              <div class="phase-d">상인이 금화 수입을 받습니다</div>
+            </div>
+            <div class="phase-box">
+              <div class="phase-n" style="color:#e05252">🔴 빨간색</div>
+              <div class="phase-t">군사 지구</div>
+              <div class="phase-d">장군이 금화 수입을 받습니다</div>
+            </div>
+            <div class="phase-box">
+              <div class="phase-n" style="color:#9b59b6">🟣 보라색</div>
+              <div class="phase-t">특수 지구</div>
+              <div class="phase-d">건설 시 특수 능력 발동</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 진행 방식 -->
+      <div id="rt-flow" class="hidden">
+        <div class="rule-sec">
+          <div class="rule-h">🔄 라운드 구조</div>
+          <p class="rule-p">매 라운드는 <b>캐릭터 선택 단계</b>와 <b>행동 단계</b>로 나뉩니다.</p>
+          <div class="phase-row" style="flex-direction:column;gap:8px">
+            <div class="phase-box" style="min-width:unset">
+              <div class="phase-n">PHASE 1</div>
+              <div class="phase-t">🎭 캐릭터 선택</div>
+              <div class="phase-d">왕관 소지자부터 시계 방향으로 1명씩 캐릭터를 비밀리에 선택합니다. 선택하지 않은 캐릭터는 제거됩니다.</div>
+            </div>
+            <div class="phase-box" style="min-width:unset">
+              <div class="phase-n">PHASE 2</div>
+              <div class="phase-t">⚔️ 행동 단계</div>
+              <div class="phase-d">1번(암살자)부터 8번(장군) 순서로 각 캐릭터를 호명합니다. 해당 캐릭터를 가진 플레이어가 자신을 공개하고 턴을 진행합니다.</div>
+            </div>
+          </div>
+        </div>
+        <div class="rule-sec">
+          <div class="rule-h">🎲 내 턴에 할 수 있는 것</div>
+          <div class="rule-list">
+            <div class="rule-item"><b>수입 선택 (필수)</b>: 💰 금화 2개를 받거나, 덱에서 카드 2장을 뽑아 1장을 선택합니다</div>
+            <div class="rule-item"><b>캐릭터 능력 사용 (선택)</b>: 내 캐릭터의 고유 능력을 1회 사용할 수 있습니다</div>
+            <div class="rule-item"><b>건물 건설 (선택)</b>: 손패에서 건물 카드 1장을 비용만큼 금화를 내고 건설합니다 (건축가는 최대 3채)</div>
+            <div class="rule-item"><b>색상 수입</b>: 내 캐릭터에 해당하는 색상 건물 수만큼 금화를 추가로 받습니다</div>
+          </div>
+        </div>
+        <div class="rule-sec">
+          <div class="rule-h">🃏 카드 뽑기 규칙</div>
+          <div class="rule-list">
+            <div class="rule-item">기본: 덱에서 2장을 보고 1장만 손에 넣고 나머지는 버립니다</div>
+            <div class="rule-item"><b>도서관</b> 건물 보유 시: 2장 모두 손에 넣습니다</div>
+            <div class="rule-item"><b>천문대</b> 건물 보유 시: 3장을 보고 1장을 선택합니다</div>
+          </div>
+        </div>
+        <div class="rule-sec">
+          <div class="rule-h">🏁 게임 종료 조건</div>
+          <div class="rule-list">
+            <div class="rule-item">누군가 <b>7채</b>의 건물을 완성하면 그 라운드를 끝까지 진행합니다</div>
+            <div class="rule-item">7채를 <b>가장 먼저</b> 완성한 플레이어는 <b>+4점</b> 보너스를 받습니다</div>
+            <div class="rule-item">같은 라운드에 7채를 완성한 다른 플레이어는 <b>+2점</b> 보너스를 받습니다</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 점수 계산 -->
+      <div id="rt-score" class="hidden">
+        <div class="rule-sec">
+          <div class="rule-h">⭐ 점수 계산 방법</div>
+          <table class="score-table">
+            <tr><th>항목</th><th>점수</th></tr>
+            <tr><td>건설된 건물 카드</td><td>카드 비용만큼 점수</td></tr>
+            <tr><td>5가지 색상 모두 보유</td><td>+3점 보너스</td></tr>
+            <tr><td>7채 최초 완성</td><td>+4점 보너스</td></tr>
+            <tr><td>같은 라운드 완성 (2등~)</td><td>+2점 보너스</td></tr>
+            <tr><td>대학교 / 용의 관문 / 마법 학교</td><td>비용 + 추가 3점</td></tr>
+          </table>
+        </div>
+        <div class="rule-sec">
+          <div class="rule-h">💡 점수 예시</div>
+          <p class="rule-p">건물 합계 20점 + 5색 보너스 3점 + 최초 완성 4점 = <b>총 27점</b></p>
+        </div>
+      </div>
+
+      <!-- 전략 팁 -->
+      <div id="rt-tips" class="hidden">
+        <div class="rule-sec">
+          <div class="rule-h">🎯 초보자 추천 전략</div>
+          <div class="rule-list">
+            <div class="rule-item"><b>상인</b>을 자주 선택해 금화를 빠르게 쌓으세요. 초록 건물과 조합하면 강력합니다</div>
+            <div class="rule-item"><b>건축가</b>는 카드 2장 추가 + 3채 건설이 가능해 빠른 완성에 유리합니다</div>
+            <div class="rule-item">같은 색상 건물을 집중 건설하면 해당 캐릭터 선택 시 수입이 늘어납니다</div>
+            <div class="rule-item">5가지 색상 모두 모으면 +3점 보너스! 보라색 건물 1채로도 달성 가능합니다</div>
+          </div>
+        </div>
+        <div class="rule-sec">
+          <div class="rule-h">🔮 심화 전략</div>
+          <div class="rule-list">
+            <div class="rule-item"><b>암살자</b>: 상대가 상인이나 건축가를 선택할 것 같으면 암살해 수입을 막으세요</div>
+            <div class="rule-item"><b>도둑</b>: 금화가 많은 상인을 노리세요. 등장 시 전부 탈취합니다</div>
+            <div class="rule-item"><b>주교</b>: 건물이 많아지면 장군의 파괴를 막기 위해 주교를 선택하세요</div>
+            <div class="rule-item"><b>왕</b>: 다음 라운드 선택 우선권 확보. 노란 건물이 많다면 더욱 효과적</div>
+            <div class="rule-item">상대방이 어떤 캐릭터를 선택할지 예측하는 <b>블러핑</b>이 핵심입니다</div>
+          </div>
+        </div>
+        <div class="rule-sec">
+          <div class="rule-h">⚠️ 주의 사항</div>
+          <div class="rule-list">
+            <div class="rule-item">같은 건물은 도시에 중복 건설 불가입니다</div>
+            <div class="rule-item">암살당한 플레이어는 그 라운드에 아무것도 할 수 없습니다</div>
+            <div class="rule-item">주교가 암살당하면 장군으로부터의 보호가 사라집니다</div>
+            <div class="rule-item">장군은 7채 완성한 플레이어의 건물을 파괴할 수 없습니다</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ 카드 도감 모달 ══ -->
+<div id="cardsModal" class="modal-bg hidden" onclick="if(event.target===this)closeCards()">
+  <div class="gmodal">
+    <div class="gm-head">
+      <div class="gm-title">🗂️ 카드 도감</div>
+      <button class="gm-close" onclick="closeCards()">✕</button>
+    </div>
+    <div class="gm-tabs" id="cardTabs">
+      <div class="gm-tab on" data-ct="chars" onclick="switchCardTab('chars')">🎭 캐릭터 (8종)</div>
+      <div class="gm-tab" data-ct="districts" onclick="switchCardTab('districts')">🏛️ 건물 (29종)</div>
+    </div>
+    <div class="gm-body">
+      <div id="ct-chars">
+        <div class="cdex-grid" id="charDexGrid"></div>
+        <div class="cdex-detail" id="charDetail"></div>
+      </div>
+      <div id="ct-districts" class="hidden">
+        <div class="cdex-filter" id="distFilter">
+          <div class="cdex-tag on" style="background:rgba(212,168,67,.15);border-color:rgba(212,168,67,.3);color:var(--gold2)" data-f="all" onclick="filterDist('all')">전체</div>
+          <div class="cdex-tag" style="--fc:#d4a017" data-f="yellow" onclick="filterDist('yellow')">🟡 귀족</div>
+          <div class="cdex-tag" style="--fc:#5b9bd5" data-f="blue" onclick="filterDist('blue')">🔵 종교</div>
+          <div class="cdex-tag" style="--fc:#4caf7d" data-f="green" onclick="filterDist('green')">🟢 상업</div>
+          <div class="cdex-tag" style="--fc:#e05252" data-f="red" onclick="filterDist('red')">🔴 군사</div>
+          <div class="cdex-tag" style="--fc:#9b59b6" data-f="purple" onclick="filterDist('purple')">🟣 특수</div>
+        </div>
+        <div class="cdex-grid" id="distDexGrid"></div>
+        <div class="cdex-detail" id="distDetail"></div>
+      </div>
+    </div>
   </div>
 </div>
 

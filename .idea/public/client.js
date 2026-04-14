@@ -968,3 +968,202 @@ function closeTT(){$('ttModal').classList.add('hidden');}
 // 페이지 로드 시 즉시 WS 연결
 // ══════════════════════════════════════
 initWS();
+
+// ══════════════════════════════════════
+// 게임 규칙 모달
+// ══════════════════════════════════════
+function openRules() {
+  $('rulesModal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closeRules() {
+  $('rulesModal').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+function switchRuleTab(tab) {
+  document.querySelectorAll('#ruleTabs .gm-tab').forEach(t => t.classList.toggle('on', t.dataset.rt === tab));
+  ['overview','flow','score','tips'].forEach(id => {
+    const el = $('rt-' + id);
+    if (el) el.classList.toggle('hidden', id !== tab);
+  });
+}
+
+// ══════════════════════════════════════
+// 카드 도감 모달
+// ══════════════════════════════════════
+const COLOR_CSS2 = {yellow:'#d4a017',blue:'#5b9bd5',green:'#4caf7d',red:'#e05252',purple:'#9b59b6'};
+const COLOR_LBL  = {yellow:'귀족 지구',blue:'종교 지구',green:'상업 지구',red:'군사 지구',purple:'특수 지구'};
+
+const CHAR_TIPS = {
+  1: '상대가 상인·건축가를 선택할 것 같을 때 암살해 수입을 막으세요. 본인도 암살될 위험이 있으니 블러핑이 중요합니다.',
+  2: '금화가 많은 상인을 주로 노리세요. 단, 암살자에게 자주 타깃이 되니 주의하세요.',
+  3: '손패가 빈약할 때 사용하면 강력합니다. 상대의 좋은 패를 가져오거나, 버리고 새로 뽑아 원하는 카드를 찾으세요.',
+  4: '노란 건물을 많이 지을수록 매 라운드 수입이 늘어납니다. 다음 라운드 선택 우선권도 큰 이점입니다.',
+  5: '건물이 많아져 장군의 파괴가 걱정될 때 선택하세요. 단, 암살당하면 보호가 사라집니다.',
+  6: '초록 건물과 조합하면 한 턴에 큰 수입을 얻을 수 있습니다. 초반부터 초록 건물을 쌓아두세요.',
+  7: '카드 2장 추가 + 3채 건설로 빠른 완성이 가능합니다. 금화가 많을 때 가장 효과적입니다.',
+  8: '주교 건물은 파괴할 수 없으니 주의하세요. 상대가 완성에 가까울 때 핵심 건물을 파괴하세요.',
+};
+
+const DIST_TIPS = {
+  library: '카드 뽑기를 선택하면 2장 모두 획득합니다. 천문대와 함께 있으면 3장 중 2장을 가져갑니다.',
+  observatory: '3장을 보고 1장을 선택합니다. 원하는 카드를 찾을 확률이 높아집니다.',
+  graveyard: '장군이 건물을 파괴할 때 💰1을 내면 그 건물을 손패로 회수할 수 있습니다.',
+  smithy: '💰2를 내고 카드 3장을 추가로 뽑을 수 있습니다. 건축가와 조합하면 엄청난 카드 수급이 가능합니다.',
+  university: '비용 6코인이지만 점수는 9점. 게임 후반에 짓기 좋습니다.',
+  dragondoor: '비용 6코인이지만 점수는 9점. 5색 보너스 달성에도 도움됩니다.',
+  school: '비용 6코인이지만 점수는 9점. 보라색이라 캐릭터 수입과 무관합니다.',
+  haunted: '게임 종료 시 원하는 색 1개로 간주됩니다. 5색 보너스 달성에 유용합니다.',
+};
+
+let currentDistFilter = 'all';
+let selectedCharCard = null;
+let selectedDistCard = null;
+
+function openCards() {
+  $('cardsModal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  buildCharDex();
+  buildDistDex();
+}
+function closeCards() {
+  $('cardsModal').classList.add('hidden');
+  document.body.style.overflow = '';
+  selectedCharCard = null;
+  selectedDistCard = null;
+}
+function switchCardTab(tab) {
+  document.querySelectorAll('#cardTabs .gm-tab').forEach(t => t.classList.toggle('on', t.dataset.ct === tab));
+  $('ct-chars').classList.toggle('hidden', tab !== 'chars');
+  $('ct-districts').classList.toggle('hidden', tab !== 'districts');
+}
+
+function buildCharDex() {
+  const grid = $('charDexGrid');
+  if (grid.innerHTML) return; // 이미 빌드됨
+  grid.innerHTML = '';
+  CHARS.forEach(ch => {
+    const card = document.createElement('div');
+    card.className = 'cdex-card c-char';
+    card.style.cssText = `background:${ch.bg};border-color:${ch.bc};`;
+    card.innerHTML = `
+      <div class="cdex-ico">${ch.icon}</div>
+      <div class="cdex-name" style="color:${ch.tc}">${ch.id}. ${ch.name}</div>
+      <div class="cdex-sub" style="color:${ch.tc}88">캐릭터 카드</div>
+      <div class="cdex-desc">${ch.abilityShort}</div>
+    `;
+    card.onclick = () => showCharDetail(ch, card);
+    grid.appendChild(card);
+  });
+}
+
+function showCharDetail(ch, cardEl) {
+  // 선택 표시
+  document.querySelectorAll('#charDexGrid .cdex-card').forEach(c => c.style.outline = '');
+  cardEl.style.outline = `2px solid ${ch.tc}`;
+  selectedCharCard = ch;
+
+  const detail = $('charDetail');
+  detail.innerHTML = `
+    <div class="cdd-head">
+      <div class="cdd-ico">${ch.icon}</div>
+      <div>
+        <div class="cdd-name" style="color:${ch.tc}">${ch.id}번 · ${ch.name}</div>
+        <div class="cdd-type">캐릭터 카드</div>
+      </div>
+    </div>
+    <div class="cdd-body">${ch.ability}</div>
+    <div class="cdd-tip">${CHAR_TIPS[ch.id] || '전략적으로 활용하세요.'}</div>
+  `;
+  detail.classList.add('show');
+  detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function buildDistDex() {
+  const grid = $('distDexGrid');
+  if (grid.innerHTML) return;
+  renderDistCards();
+}
+
+function renderDistCards() {
+  const grid = $('distDexGrid');
+  grid.innerHTML = '';
+  const filtered = currentDistFilter === 'all'
+    ? DISTRICTS
+    : DISTRICTS.filter(d => d.color === currentDistFilter);
+
+  filtered.forEach(d => {
+    const card = document.createElement('div');
+    const cc = COLOR_CSS2[d.color];
+    card.className = `cdex-card c-${d.color}`;
+    card.style.background = `${cc}11`;
+    card.innerHTML = `
+      <div class="cdex-cost" style="background:${cc};color:${d.color==='purple'?'#fff':'#07090f'}">${d.cost}</div>
+      <div class="cdex-ico">${d.icon}</div>
+      <div class="cdex-name" style="color:${cc}">${d.name}</div>
+      <div class="cdex-sub">${COLOR_LBL[d.color]}</div>
+      ${d.special ? '<div class="cdex-badge" style="color:#c39bd3;border-color:rgba(155,89,182,.3);background:rgba(155,89,182,.1)">✨ 특수</div>' : ''}
+    `;
+    card.onclick = () => showDistDetail(d, card);
+    grid.appendChild(card);
+  });
+}
+
+function filterDist(filter) {
+  currentDistFilter = filter;
+  // 필터 버튼 스타일
+  document.querySelectorAll('#distFilter .cdex-tag').forEach(t => {
+    const isOn = t.dataset.f === filter;
+    t.classList.toggle('on', isOn);
+    if (isOn) {
+      const colorMap = {all:'rgba(212,168,67,.15)',yellow:'rgba(212,160,23,.2)',blue:'rgba(91,155,213,.2)',green:'rgba(76,175,125,.2)',red:'rgba(224,82,82,.2)',purple:'rgba(155,89,182,.2)'};
+      const borderMap = {all:'rgba(212,168,67,.3)',yellow:'rgba(212,160,23,.4)',blue:'rgba(91,155,213,.4)',green:'rgba(76,175,125,.4)',red:'rgba(224,82,82,.4)',purple:'rgba(155,89,182,.4)'};
+      const textMap = {all:'var(--gold2)',yellow:'#d4a017',blue:'#5b9bd5',green:'#4caf7d',red:'#e05252',purple:'#9b59b6'};
+      t.style.background = colorMap[filter] || '';
+      t.style.borderColor = borderMap[filter] || '';
+      t.style.color = textMap[filter] || '';
+    } else {
+      t.style.background = '';
+      t.style.borderColor = '';
+      t.style.color = '';
+    }
+  });
+  // 상세 패널 닫기
+  const detail = $('distDetail');
+  detail.classList.remove('show');
+  selectedDistCard = null;
+  document.querySelectorAll('#distDexGrid .cdex-card').forEach(c => c.style.outline = '');
+  renderDistCards();
+}
+
+function showDistDetail(d, cardEl) {
+  const cc = COLOR_CSS2[d.color];
+  document.querySelectorAll('#distDexGrid .cdex-card').forEach(c => c.style.outline = '');
+  cardEl.style.outline = `2px solid ${cc}`;
+  selectedDistCard = d;
+
+  const copies = d.color === 'purple' ? 1 : 3;
+  const detail = $('distDetail');
+  detail.innerHTML = `
+    <div class="cdd-head">
+      <div class="cdd-ico">${d.icon}</div>
+      <div>
+        <div class="cdd-name" style="color:${cc}">${d.name}</div>
+        <div class="cdd-type">${COLOR_LBL[d.color]} · 건설 비용 ${d.cost}💰 · ${copies}장</div>
+      </div>
+    </div>
+    ${d.special ? `<div class="cdd-body"><b>✨ 특수 능력:</b> ${d.special}</div>` : `<div class="cdd-body">건설 비용만큼 점수를 얻습니다. <b>${d.cost}점</b>으로 계산됩니다.</div>`}
+    ${(DIST_TIPS[d.id] ? `<div class="cdd-tip">${DIST_TIPS[d.id]}</div>` : '')}
+  `;
+  detail.classList.add('show');
+  detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ESC키로 모달 닫기
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeRules();
+    closeCards();
+    closeTT();
+  }
+});
