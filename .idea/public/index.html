@@ -306,8 +306,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .cb-thf{background:rgba(245,166,35,.2);color:#f5a623;border-color:rgba(245,166,35,.3)}
 .city-p{padding:8px;border-top:1px solid var(--border);max-height:185px;overflow-y:auto}
 /* 상대 건물 상세 팝업 */
-.enemy-city-modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:600;backdrop-filter:blur(3px)}
-.ecm-box{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px;max-width:480px;width:90%;max-height:80vh;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.enemy-city-modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:600;backdrop-filter:blur(5px)}
+.ecm-box{background:linear-gradient(145deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:16px;padding:24px;max-width:600px;width:92%;max-height:85vh;display:flex;flex-direction:column;position:relative;overflow:hidden;animation:mi .25s ease-out}
 .ecm-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
 .ecm-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .ecm-title{font-size:14px;font-weight:800;color:var(--gold2)}
@@ -316,7 +316,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .ecm-stats{display:flex;gap:14px;margin-bottom:14px;padding:10px 12px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(255,255,255,.06)}
 .ecm-stat{font-size:12px;color:var(--dim2);display:flex;align-items:center;gap:4px}
 .ecm-stat strong{color:var(--text)}
-.ecm-grid{display:flex;flex-wrap:wrap;gap:8px;overflow-y:auto}
+.ecm-grid{display:flex;flex-wrap:wrap;gap:10px;overflow-y:auto;padding:4px 0}
 /* 로그 전체 모달 */
 .log-modal{background:var(--bg2);border:1px solid var(--border);border-radius:14px;width:min(560px,92vw);max-height:80vh;display:flex;flex-direction:column;position:relative;overflow:hidden}
 .log-modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
@@ -376,6 +376,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .chat-send:hover{background:rgba(212,168,67,.3)}
 /* BGM 로비 버튼 */
 #bgmBtnLobby:hover{background:rgba(212,168,67,.15);border-color:rgba(212,168,67,.3);color:var(--gold2)}
+#sfxBtnLobby:hover{background:rgba(91,155,213,.15);border-color:rgba(91,155,213,.3);color:#89c4f4}
 /* 알림 */
 #notif{position:fixed;top:90px;left:50%;transform:translateX(-50%) translateY(-10px);padding:8px 20px;border-radius:20px;font-size:12px;font-weight:700;z-index:1000;opacity:0;transition:.22s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,.4)}
 #notif.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -454,12 +455,16 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <button class="btn btn-sm" id="btnJoinCode" onclick="doJoinByCode()" disabled style="opacity:.4">🔑 코드로 참가</button>
   </div>
   <!-- BGM 버튼 (로비) -->
-  <button onclick="bgmToggle()" id="bgmBtnLobby" style="position:fixed;bottom:20px;right:20px;z-index:100;padding:8px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:rgba(10,12,20,.9);color:var(--dim2);font-size:12px;cursor:pointer;transition:.2s;backdrop-filter:blur(4px)">🎵 음악 켜기</button>
+  <div style="position:fixed;bottom:20px;right:20px;z-index:100;display:flex;gap:6px">
+    <button onclick="sfxToggle()" id="sfxBtnLobby" style="padding:8px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:rgba(10,12,20,.9);color:var(--dim2);font-size:12px;cursor:pointer;transition:.2s;backdrop-filter:blur(4px)">🔔 효과음</button>
+    <button onclick="bgmToggle()" id="bgmBtnLobby" style="padding:8px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:rgba(10,12,20,.9);color:var(--dim2);font-size:12px;cursor:pointer;transition:.2s;backdrop-filter:blur(4px)">🎵 음악 켜기</button>
+  </div>
 </div>
 
 <!-- ══ WAITING ══ -->
 <div id="screen-waiting" class="hidden" style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;gap:14px">
-  <div class="logo" style="margin-bottom:0">
+  <div class="logo" style="margin-bottom:0;position:relative;width:100%;max-width:460px;text-align:center">
+    <button onclick="goBackToLobby()" style="position:absolute;left:0;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--dim2);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:5px;transition:.15s" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='rgba(255,255,255,.06)'">← 뒤로가기</button>
     <span class="logo-ico" style="font-size:44px">🏰</span>
     <div class="logo-title" style="font-size:28px;letter-spacing:5px">대기실</div>
   </div>
@@ -507,6 +512,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <span>⭐<b id="tbScore">0</b></span>
     </div>
     <button id="bgmBtn" onclick="bgmToggle()" style="padding:4px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--dim2);font-size:11px;cursor:pointer;transition:.15s;white-space:nowrap">🎵 음악 켜기</button>
+    <button id="sfxBtn" onclick="sfxToggle()" style="padding:4px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--dim2);font-size:11px;cursor:pointer;transition:.15s;white-space:nowrap">🔔 효과음 켜기</button>
   </div>
   <div class="turn-bar" id="turnBar"></div>
 
@@ -759,7 +765,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 
 <!-- 상대 건물 상세 모달 -->
-<div id="enemyCityModal" class="modal-bg hidden" onclick="if(event.target===this)closeEnemyCity()">
+<div id="enemyCityModal" class="enemy-city-modal hidden" onclick="if(event.target===this)closeEnemyCity()">
   <div class="ecm-box">
     <div class="ecm-head">
       <div class="ecm-title" id="ecmTitle">플레이어의 도시</div>

@@ -36,6 +36,7 @@ const isMyCS    = () => G && G.phase==='select_character' && G.selOrder[G.selIdx
 
 function notify(msg, type='info') {
   const e=$('notif'); if(!e)return;
+  if(type==='bad') sfxPlay('error');
   e.textContent=msg; e.className=`show n-${type}`;
   if(ntimer)clearTimeout(ntimer);
   ntimer=setTimeout(()=>e.className='',3000);
@@ -322,6 +323,7 @@ function startSolo(){
 }
 
 function doCreateRoom(){
+  sfxPlay('click');
   const name=($('hostName').value||'').trim()||'호스트';
   MY_ID=uid();IS_HOST=true;
   // WS 전송 먼저
@@ -353,6 +355,19 @@ function goWaitScreen(isHost){
   $('waitMsg').classList.toggle('hidden',isHost);
 }
 
+function goBackToLobby(){
+  sfxPlay('click');
+  // WS 연결 유지하되 방에서 나가기
+  if(ws && ws.readyState===1 && MY_ROOM && MY_ROOM!=='LOCAL'){
+    ws.close(); // 연결 끊으면 서버가 자동으로 방에서 제거
+  }
+  MY_ROOM=null; MY_ID=null; IS_HOST=false;
+  $('screen-waiting').classList.add('hidden');
+  $('screen-lobby').classList.remove('hidden');
+  // 재연결
+  setTimeout(initWS, 300);
+}
+
 function renderWaitRoom(room){
   const ce=$('wCode');if(ce)ce.textContent=room.code;
   const cnt=$('wCount');if(cnt)cnt.textContent=`${room.playerCount}명 대기 중`;
@@ -374,7 +389,7 @@ function renderWaitRoom(room){
   });
 }
 
-function hostStart(){if(!IS_HOST)return;wsSend({type:'start_game',aiCount:AI_WAIT});}
+function hostStart(){if(!IS_HOST)return;sfxPlay('build');wsSend({type:'start_game',aiCount:AI_WAIT});}
 function copyCode(){navigator.clipboard?.writeText(MY_ROOM||'').then(()=>notify('코드 복사됨!','ok'));}
 
 // ══════════════════════════════════════
@@ -454,6 +469,7 @@ function aiAutoAll(){
 
 function selectCharacter(charId){
   if(!isMyCS())return;
+  sfxPlay('ability');
   if(MY_ROOM!=='LOCAL'&&!IS_HOST){sendAction({type:'select_char',charId});return;}
   execSelectChar(myIdx(),charId);
 }
@@ -491,7 +507,7 @@ function advChar(idx){
   G.curPi=pi;G.actionPhase='choose';
   G.players[pi].abilityUsed=false;
   G.players[pi].buildsLeft=G.players[pi].selectedCharacter?.id===7?3:1;
-  if(pi===myIdx()){abilityDone=false;feed('✨',`<b>내 턴!</b> 수입을 선택하세요.`,'system');}
+  if(pi===myIdx()){abilityDone=false;sfxPlay('turn');feed('✨',`<b>내 턴!</b> 수입을 선택하세요.`,'system');}
   else if(G.players[pi].isAI){enqueueAI(pi);}
   else{feed('⏳',`<b>${G.players[pi].name}</b>의 턴입니다.`,'system');}
 }
@@ -501,6 +517,7 @@ function advChar(idx){
 // ══════════════════════════════════════
 function takeGold(){
   if(!isMyTurn()||G.actionPhase!=='choose')return;
+  sfxPlay('gold');
   if(MY_ROOM!=='LOCAL'&&!IS_HOST){sendAction({type:'take_gold'});return;}
   execTakeGold(myIdx());
 }
@@ -515,6 +532,7 @@ function execTakeGold(pi){
 
 function drawCard(){
   if(!isMyTurn()||G.actionPhase!=='choose')return;
+  sfxPlay('ability');
   if(MY_ROOM!=='LOCAL'&&!IS_HOST){sendAction({type:'draw_card'});return;}
   execDrawCard(myIdx());
 }
@@ -557,7 +575,8 @@ function applyIncome(pi){
 // 건설
 // ══════════════════════════════════════
 function buildDistrict(){
-  if(!selCard){notify('건물을 선택하세요!','warn');return;}
+  if(!selCard){sfxPlay('error');notify('건물을 선택하세요!','warn');return;}
+  sfxPlay('build');
   if(MY_ROOM!=='LOCAL'&&!IS_HOST){sendAction({type:'build',uid:selCard});return;}
   execBuild(myIdx(),selCard);
 }
@@ -582,7 +601,8 @@ function execBuild(pi,u){
 // 능력
 // ══════════════════════════════════════
 function useAbility(){
-  if(!isMyTurn())return;if(abilityDone){notify('이미 사용했습니다!','warn');return;}
+  if(!isMyTurn())return;if(abilityDone){sfxPlay('error');notify('이미 사용했습니다!','warn');return;}
+  sfxPlay('ability');
   const ch=G.players[myIdx()].selectedCharacter;if(!ch)return;
   if(ch.id===1){pendAbility='assassin';render();notify('🗡️ 우측에서 암살할 캐릭터 선택','warn');return;}
   if(ch.id===2){pendAbility='thief';render();notify('🦹 우측에서 훔칠 캐릭터 선택 (1·2번 제외)','warn');return;}
@@ -602,7 +622,7 @@ function execAbility(pi,action){
     G.assassinTarget=action.charId;p.abilityUsed=true;
     if(pi===myIdx()){pendAbility=null;abilityDone=true;}
     feed('🗡️',`<b>${p.name}(암살자)</b> <b>${CHARS.find(c=>c.id===action.charId)?.name}</b> 암살!`,'combat');
-    if(pi===myIdx())notify('🗡️ 암살!','ok');
+    if(pi===myIdx()){sfxPlay('assassin');notify('🗡️ 암살!','ok');}
   } else if(at==='thief'){
     if(action.charId<=2){if(pi===myIdx())notify('암살자/도둑 불가!','warn');return;}
     if(G.assassinTarget===action.charId){if(pi===myIdx())notify('암살된 캐릭터 불가!','warn');return;}
@@ -634,7 +654,7 @@ function execAbility(pi,action){
       p.gold-=cost;tp.city=tp.city.filter(c=>c.uid!==action.distUid);G.discard.push(dist);
       feed('⚔️',`<b>${p.name}(장군)</b> <b>${tp.name}</b>의 ${dist.icon}<b>${dist.name}</b> 파괴! (💰-${cost})`,'combat');
       p.abilityUsed=true;
-      if(pi===myIdx()){pendAbility=null;warlordTpi=null;abilityDone=true;notify(`⚔️ 파괴!`,'ok');}
+      if(pi===myIdx()){sfxPlay('assassin');pendAbility=null;warlordTpi=null;abilityDone=true;notify(`⚔️ 파괴!`,'ok');}
     }
   }
   syncState();render();
@@ -642,6 +662,7 @@ function execAbility(pi,action){
 function cancelAbility(){pendAbility=null;wizMode=null;wizDiscSel=[];warlordTpi=null;selCard=null;render();}
 function endTurn(){
   if(!isMyTurn())return;
+  sfxPlay('click');
   if(MY_ROOM!=='LOCAL'&&!IS_HOST){sendAction({type:'end_turn'});return;}
   execEndTurn(myIdx());
 }
@@ -714,6 +735,7 @@ function resolveGameOver(){
   syncState();render();setTimeout(showGameOver,800);
 }
 function showGameOver(){
+  sfxPlay('win');
   const s=G.players.map(p=>({...p,score:calcScore(p)})).sort((a,b)=>b.score-a.score);
   $('goWinner').textContent=`🎉 ${s[0].name} 승리!`;
   const list=$('goScores');list.innerHTML='';
@@ -985,88 +1007,55 @@ function rCityPanel(){
   });
 }
 
-// 상대 도시 — 왼쪽 패널에 인라인으로 표시 (모달 X)
-let _ecPi = null; // 현재 열린 플레이어 idx
+// 상대 도시 — 가운데 모달로 표시
+let _ecPi = null;
 
 function openEnemyCity(pi){
-  // 같은 플레이어 다시 클릭 → 닫기 (토글)
-  if(_ecPi === pi){ closeEnemyCity(); return; }
+  if(!G) return;
   _ecPi = pi;
-  // 플레이어 카드 선택 표시 갱신
-  document.querySelectorAll('#pList .pcard.clickable').forEach(c=>c.style.outline='');
-  const cards = document.querySelectorAll('#pList .pcard');
-  // city-p 패널을 건물 뷰로 교체
-  renderEnemyCityInPanel(pi);
-  // 플레이어 목록에서 해당 카드 테두리 강조
-  rPlayerList();
-}
-
-function closeEnemyCity(){
-  _ecPi = null;
-  rCityPanel(); // 기본 도시 목록으로 복원
-  rPlayerList();
-}
-
-function renderEnemyCityInPanel(pi){
+  sfxPlay('click');
   const p = G.players[pi]; if(!p) return;
-  const panel = $('cityPanel'); if(!panel) return;
   const score = calcScore(p);
   const colors = new Set(p.city.map(c=>c.color));
 
-  panel.innerHTML='';
-
-  // 헤더
-  const head = el('div','');
-  head.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06)';
-  head.innerHTML=`
-    <div style="display:flex;align-items:center;gap:6px">
-      <div style="font-size:18px">${p.avatar}</div>
-      <div>
-        <div style="font-size:12px;font-weight:700;color:${p.color}">${esc(p.name)}</div>
-        <div style="font-size:10px;color:var(--dim2)">${p.city.length}/7채 · ⭐${score}점</div>
-      </div>
-    </div>
-    <button onclick="closeEnemyCity()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--dim2);width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center">✕</button>
+  $('ecmTitle').innerHTML=`${p.avatar} <span style="color:${p.color}">${esc(p.name)}</span>의 도시`;
+  $('ecmStats').innerHTML=`
+    <span class="ecm-stat">🏛️ <strong>${p.city.length}/7채</strong></span>
+    <span class="ecm-stat">💰 <strong>${p.gold}개</strong></span>
+    <span class="ecm-stat">🃏 <strong>${p.hand.length}장</strong></span>
+    <span class="ecm-stat">⭐ <strong>${score}점</strong></span>
+    ${p.complete?'<span class="ecm-stat" style="color:#7ecca1;font-weight:700">🎉 도시 완성!</span>':''}
+    ${colors.size>=5?'<span class="ecm-stat" style="color:var(--gold2);font-weight:700">🌈 5색 보너스!</span>':''}
   `;
-  panel.appendChild(head);
 
-  // 스탯
-  const stats = el('div','');
-  stats.style.cssText='display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;padding:8px;background:rgba(255,255,255,.03);border-radius:7px;border:1px solid rgba(255,255,255,.06)';
-  stats.innerHTML=`
-    <span style="font-size:11px;color:var(--dim2)">💰<strong style="color:var(--text)">${p.gold}</strong></span>
-    <span style="font-size:11px;color:var(--dim2)">🃏<strong style="color:var(--text)">${p.hand.length}장</strong></span>
-    ${p.complete?'<span style="font-size:11px;color:#7ecca1;font-weight:700">🎉완성!</span>':''}
-    ${colors.size>=5?'<span style="font-size:11px;color:var(--gold2)">🌈5색!</span>':''}
-  `;
-  panel.appendChild(stats);
-
-  // 건물 카드 그리드
+  const grid=$('ecmGrid'); grid.innerHTML='';
   if(!p.city.length){
-    const empty = el('div','');
-    empty.style.cssText='color:var(--dim);font-size:12px;padding:8px 0;text-align:center';
-    empty.textContent='아직 건설된 건물이 없습니다.';
-    panel.appendChild(empty);
-    return;
-  }
-
-  const grid = el('div','');
-  grid.style.cssText='display:flex;flex-wrap:wrap;gap:6px;max-height:220px;overflow-y:auto';
-
-  const colorOrder=['yellow','blue','green','red','purple'];
-  colorOrder.forEach(color=>{
-    p.city.filter(c=>c.color===color).forEach(c=>{
-      const card = el('div',`dcard c-${color}`);
-      card.style.width='72px';
-      card.innerHTML=`<div class="dc-ico">${c.icon}</div><div class="dc-nm">${c.name}</div><div class="dc-cost">${c.cost}</div>${c.special?'<div class="dc-sp">✨</div>':''}`;
-      // 클릭 시 툴팁 (이건 별도 레이어라 OK)
-      card.onclick=()=>openTT(c);
-      card.style.cursor='pointer';
-      grid.appendChild(card);
+    grid.innerHTML='<div style="color:var(--dim);font-size:13px;padding:16px;text-align:center;width:100%">아직 건설된 건물이 없습니다.</div>';
+  } else {
+    const colorOrder=['yellow','blue','green','red','purple'];
+    colorOrder.forEach(color=>{
+      p.city.filter(c=>c.color===color).forEach(c=>{
+        const card=el('div',`dcard c-${color}`);
+        card.style.width='90px';
+        card.innerHTML=`<div class="dc-ico" style="font-size:26px">${c.icon}</div><div class="dc-nm">${c.name}</div><div class="dc-cost">${c.cost}</div>${c.special?'<div class="dc-sp">✨</div>':''}`;
+        card.onclick=()=>openTT(c);
+        card.style.cursor='pointer';
+        grid.appendChild(card);
+      });
     });
-  });
-  panel.appendChild(grid);
+  }
+  $('enemyCityModal').classList.remove('hidden');
+  rPlayerList(); // 선택 강조
 }
+
+function closeEnemyCity(){
+  _ecPi=null;
+  $('enemyCityModal').classList.add('hidden');
+  rPlayerList();
+}
+
+// 인라인 패널 렌더 (우측 하단용 — 더 이상 사용 안 함, 호환 유지)
+function renderEnemyCityInPanel(pi){ openEnemyCity(pi); }
 
 // 전체 로그 모달
 function openLogModal(){
@@ -1490,4 +1479,138 @@ function updateBgmBtn(){
 
 function bgmSetVol(v){
   _bgmVol = Math.max(0, Math.min(1, v));
+}
+
+// ══════════════════════════════════════════════════
+// 🔔 효과음 시스템 (Web Audio API)
+// ══════════════════════════════════════════════════
+let _sfxOn  = true;
+let _sfxCtx = null;
+
+function sfxInit(){
+  if(_sfxCtx) return;
+  try { _sfxCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+  catch(e){ console.warn('SFX 미지원'); }
+}
+
+function sfxToggle(){
+  _sfxOn = !_sfxOn;
+  updateSfxBtn();
+  if(_sfxOn) sfxPlay('click');
+}
+
+function updateSfxBtn(){
+  const on = _sfxOn;
+  const label = on ? '🔔 효과음 켜짐' : '🔕 효과음 꺼짐';
+  ['sfxBtn','sfxBtnLobby'].forEach(id=>{
+    const b = $(id); if(!b) return;
+    b.textContent = label;
+    b.style.color = on ? '#89c4f4' : 'var(--dim2)';
+    b.style.borderColor = on ? 'rgba(91,155,213,.4)' : 'rgba(255,255,255,.1)';
+    b.style.background = on ? 'rgba(91,155,213,.1)' : 'rgba(255,255,255,.04)';
+  });
+}
+
+// 효과음 정의
+function sfxPlay(type){
+  if(!_sfxOn) return;
+  sfxInit();
+  if(!_sfxCtx) return;
+  const ctx = _sfxCtx;
+  if(ctx.state==='suspended') ctx.resume();
+
+  const g = ctx.createGain();
+  g.connect(ctx.destination);
+
+  switch(type){
+    case 'click': {
+      // 짧고 경쾌한 클릭음
+      const o=ctx.createOscillator();
+      o.type='sine'; o.frequency.value=880;
+      g.gain.setValueAtTime(0.12,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.08);
+      o.connect(g); o.start(); o.stop(ctx.currentTime+0.08);
+      break;
+    }
+    case 'build': {
+      // 건물 건설: 낮은음→높은음 스윕
+      const o=ctx.createOscillator();
+      o.type='triangle';
+      o.frequency.setValueAtTime(220,ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(660,ctx.currentTime+0.18);
+      g.gain.setValueAtTime(0.15,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.25);
+      o.connect(g); o.start(); o.stop(ctx.currentTime+0.25);
+      break;
+    }
+    case 'gold': {
+      // 금화: 동전 소리
+      [0,0.06,0.12].forEach((t,i)=>{
+        const o=ctx.createOscillator();
+        const env=ctx.createGain();
+        o.type='sine'; o.frequency.value=1200-i*100;
+        env.gain.setValueAtTime(0.1,ctx.currentTime+t);
+        env.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+t+0.1);
+        o.connect(env); env.connect(ctx.destination);
+        o.start(ctx.currentTime+t); o.stop(ctx.currentTime+t+0.12);
+      });
+      break;
+    }
+    case 'assassin': {
+      // 암살: 낮고 섬뜩한 음
+      const o=ctx.createOscillator();
+      o.type='sawtooth'; o.frequency.value=110;
+      g.gain.setValueAtTime(0.12,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.4);
+      o.connect(g); o.start(); o.stop(ctx.currentTime+0.4);
+      break;
+    }
+    case 'ability': {
+      // 능력 사용: 마법 같은 상승음
+      const o=ctx.createOscillator();
+      o.type='sine';
+      o.frequency.setValueAtTime(440,ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(1760,ctx.currentTime+0.3);
+      g.gain.setValueAtTime(0.1,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.35);
+      o.connect(g); o.start(); o.stop(ctx.currentTime+0.35);
+      break;
+    }
+    case 'turn': {
+      // 내 턴 알림: 두 음이 겹치는 알림
+      [0,0.12].forEach((t,i)=>{
+        const o=ctx.createOscillator();
+        const env=ctx.createGain();
+        o.type='sine'; o.frequency.value=i===0?523:784;
+        env.gain.setValueAtTime(0.1,ctx.currentTime+t);
+        env.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+t+0.2);
+        o.connect(env); env.connect(ctx.destination);
+        o.start(ctx.currentTime+t); o.stop(ctx.currentTime+t+0.22);
+      });
+      break;
+    }
+    case 'error': {
+      // 오류: 낮은 버즈음
+      const o=ctx.createOscillator();
+      o.type='square'; o.frequency.value=120;
+      g.gain.setValueAtTime(0.08,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.18);
+      o.connect(g); o.start(); o.stop(ctx.currentTime+0.18);
+      break;
+    }
+    case 'win': {
+      // 승리: 팡파르 (BGM과 다른 짧은 버전)
+      [523,659,784,1047].forEach((f,i)=>{
+        const o=ctx.createOscillator();
+        const env=ctx.createGain();
+        o.type='square'; o.frequency.value=f;
+        const t=ctx.currentTime+i*0.15;
+        env.gain.setValueAtTime(0.07,t);
+        env.gain.exponentialRampToValueAtTime(0.001,t+0.3);
+        o.connect(env); env.connect(ctx.destination);
+        o.start(t); o.stop(t+0.32);
+      });
+      break;
+    }
+  }
 }
