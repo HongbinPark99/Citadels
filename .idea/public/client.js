@@ -266,7 +266,7 @@ function renderRoomList(rooms) {
       </div>
       ${full
         ? '<div class="rl-full">가득 참</div>'
-        : `<button class="rl-join" onclick="quickJoin('${r.code}')">입장 →</button>`}
+        : `<button class="rl-join" onclick="tryQuickJoin('${r.code}')">입장 →</button>`}
     `;
     list.appendChild(d);
   });
@@ -277,7 +277,29 @@ function refreshRooms() {
   if(ok) notify('방 목록 갱신','info');
 }
 
-// 방 목록 클릭 입장
+// 방 목록 클릭 입장 (이름 확인 포함)
+function tryQuickJoin(code){
+  const nameInp=$('joinName');
+  const name=(nameInp?.value||'').trim();
+  if(!name){
+    // 이름 입력창 강조 후 포커스
+    if(nameInp){
+      nameInp.style.borderColor='#e05252';
+      nameInp.style.boxShadow='0 0 0 3px rgba(224,82,82,.2)';
+      nameInp.focus();
+      nameInp.placeholder='닉네임을 먼저 입력하세요! ←';
+      setTimeout(()=>{
+        nameInp.style.borderColor='';
+        nameInp.style.boxShadow='';
+        nameInp.placeholder='닉네임을 입력하세요...';
+      },2500);
+    }
+    notify('닉네임을 먼저 입력해주세요!','warn');
+    return;
+  }
+  quickJoin(code);
+}
+
 function quickJoin(code) {
   const name=($('joinName').value||'').trim()||'플레이어';
   MY_ID=uid(); IS_HOST=false;
@@ -309,7 +331,12 @@ function doCreateRoom(){
 }
 
 function doJoinByCode(){
-  const name=($('joinName').value||'').trim()||'플레이어';
+  const nameInp=$('joinName');
+  const name=(nameInp?.value||'').trim();
+  if(!name){
+    if(nameInp){nameInp.style.borderColor='#e05252';nameInp.focus();setTimeout(()=>nameInp.style.borderColor='',2000);}
+    notify('닉네임을 먼저 입력해주세요!','warn');return;
+  }
   const code=($('joinCode').value||'').trim().toUpperCase();
   if(code.length<4){notify('방 코드를 입력하세요!','warn');return;}
   MY_ID=uid();IS_HOST=false;
@@ -745,9 +772,10 @@ function rPlayerList(){
     const isDead=G.assassinTarget!==null&&p.selectedCharacter?.id===G.assassinTarget&&G.phase==='player_turn';
     const isWarlord=pendAbility==='warlord'&&!isMe&&p.city.length>0&&p.city.length<7&&!(p.selectedCharacter?.id===5&&G.assassinTarget!==5);
     const isWizSwap=pendAbility==='wizard'&&wizMode==='swap'&&!isMe;
-    const d=el('div','pcard'+(isMe?' me':'')+(isTurn?' active':'')+(isDead?' dead':'')+(isWarlord||isWizSwap?' tsel':''));
+    const d=el('div','pcard'+(isMe?' me':'')+(isTurn?' active':'')+(isDead?' dead':'')+(isWarlord||isWizSwap?' tsel':(!isMe?' clickable':'')));
     if(isWarlord)d.onclick=()=>{warlordTpi=i;renderWarlordOverlay(i);};
-    if(isWizSwap)d.onclick=()=>doWizSwap(i);
+    else if(isWizSwap)d.onclick=()=>doWizSwap(i);
+    else if(!isMe)d.onclick=()=>openEnemyCity(i);
     const ci=G.phase==='player_turn'&&p.selectedCharacter?p.selectedCharacter.icon:isMe&&p.selectedCharacter?p.selectedCharacter.icon:'❓';
     const pips=p.city.map(c=>`<div class="pip" style="background:${CCSS[c.color]};border-color:${CCSS[c.color]}55" title="${c.name}"></div>`).join('');
     d.innerHTML=`
@@ -786,15 +814,15 @@ function renderLogBar(){
   if(!G)return;
   const bar=$('logBarInner'); if(!bar)return;
   bar.innerHTML='';
-  G.log.slice(0,15).forEach((e,i)=>{
+  // 위에서 아래로: 최신 항목이 맨 위 (최대 3줄 표시)
+  const visible=G.log.slice(0,3);
+  visible.forEach((e,i)=>{
     const d=el('div',`log-entry ev-${e.type||'system'}${i===0?' ev-latest':''}`);
     d.innerHTML=`<span class="log-ico">${e.icon}</span><span class="log-txt">${e.html}</span>`;
     bar.appendChild(d);
   });
   const cnt=$('logBarCnt');
-  if(cnt)cnt.textContent=`${G.log.length}건`;
-  // 맨 왼쪽(최신)으로 스크롤
-  bar.scrollLeft=0;
+  if(cnt)cnt.textContent=`총 ${G.log.length}건`;
 }
 function rMain(){const main=$('mainArea');main.innerHTML='';if(!G)return;if(G.phase==='select_character')rCharSel(main);else rTurnPhase(main);}
 function rCharSel(main){

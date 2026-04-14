@@ -178,30 +178,28 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .to-arr{color:var(--dim);font-size:10px;flex-shrink:0}
 
 /* ── 상단 로그바 ── */
-.log-bar{grid-column:1/-1;background:rgba(8,10,18,.95);border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:stretch;overflow:hidden}
-.log-bar-inner{display:flex;align-items:center;gap:0;overflow-x:auto;flex:1;padding:0 12px;scroll-behavior:smooth}
-.log-bar-inner::-webkit-scrollbar{height:3px}
-.log-bar-inner::-webkit-scrollbar-thumb{background:rgba(212,168,67,.2);border-radius:2px}
-.log-entry{display:flex;align-items:center;gap:6px;padding:0 12px;border-right:1px solid rgba(255,255,255,.05);flex-shrink:0;height:100%}
-.log-entry:first-child{padding-left:0}
-.log-entry.ev-latest{background:rgba(212,168,67,.05)}
-.log-ico{font-size:15px;flex-shrink:0}
-.log-txt{font-size:11px;color:var(--dim2);line-height:1.4;max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.log-bar{grid-column:1/-1;background:rgba(8,10,18,.96);border-bottom:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;overflow:hidden;position:relative}
+.log-bar-inner{display:flex;flex-direction:column;gap:0;overflow-y:hidden;flex:1;padding:0}
+.log-entry{display:flex;align-items:center;gap:8px;padding:4px 12px;border-bottom:1px solid rgba(255,255,255,.03);flex-shrink:0;min-height:0}
+.log-entry:last-child{border-bottom:none}
+.log-entry.ev-latest{background:rgba(212,168,67,.06)}
+.log-ico{font-size:13px;flex-shrink:0}
+.log-txt{font-size:11px;color:var(--dim2);line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
 .log-txt b{color:var(--text)}
 .ev-gold .log-ico{color:#f0c860}.ev-card .log-ico{color:#5b9bd5}
 .ev-build .log-ico{color:#4caf7d}.ev-combat .log-ico{color:#e05252}
 .ev-win .log-ico{color:#f0c860}.ev-system .log-ico{color:var(--gold)}
 .ev-system .log-txt,.ev-win .log-txt{color:var(--text)}
-.log-bar-right{display:flex;align-items:center;gap:0;border-left:1px solid rgba(255,255,255,.06);flex-shrink:0}
-.log-cnt{padding:0 10px;font-size:9px;color:var(--dim);letter-spacing:1px;white-space:nowrap}
-.log-expand{width:36px;height:100%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--dim);font-size:13px;transition:.15s;border-left:1px solid rgba(255,255,255,.06)}
-.log-expand:hover{background:rgba(255,255,255,.05);color:var(--gold)}
+.log-bar-footer{display:flex;align-items:center;justify-content:space-between;padding:3px 10px;border-top:1px solid rgba(255,255,255,.05);flex-shrink:0;background:rgba(255,255,255,.02)}
+.log-cnt{font-size:9px;color:var(--dim);letter-spacing:1px}
+.log-expand{font-size:10px;color:var(--dim);cursor:pointer;padding:2px 8px;border-radius:5px;transition:.15s;border:1px solid rgba(255,255,255,.07)}
+.log-expand:hover{background:rgba(212,168,67,.1);color:var(--gold);border-color:rgba(212,168,67,.2)}
 
 /* 왼쪽 패널 */
 .p-left{background:rgba(10,12,20,.92);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;grid-row:4}
 .p-sect{padding:7px 11px 5px;font-size:9px;letter-spacing:3px;color:var(--dim);border-bottom:1px solid rgba(255,255,255,.04)}
 .p-list{overflow-y:auto;flex:1;padding:6px}
-.pcard{border-radius:9px;padding:9px 10px;margin-bottom:5px;border:1px solid rgba(255,255,255,.06);background:rgba(20,24,38,.6);transition:.15s;cursor:default}
+.pcard{border-radius:9px;padding:9px 10px;margin-bottom:5px;border:1px solid rgba(255,255,255,.06);background:rgba(20,24,38,.6);transition:.15s;cursor:default}.pcard.clickable{cursor:pointer}.pcard.clickable:hover{border-color:rgba(212,168,67,.25);background:rgba(20,24,38,.85)}
 .pcard.me{border-color:rgba(155,89,182,.35)}
 .pcard.active{border-color:rgba(212,168,67,.5);background:rgba(212,168,67,.06);animation:glow 2s ease-in-out infinite}
 @keyframes glow{0%,100%{box-shadow:0 0 0 rgba(212,168,67,0)}50%{box-shadow:0 0 12px rgba(212,168,67,.15)}}
@@ -436,8 +434,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
   <!-- 방 참가 -->
   <div class="tab-panel card hidden" id="t-join">
-    <label class="lbl">내 이름</label>
-    <input class="inp" id="joinName" placeholder="플레이어 이름..." maxlength="10">
+    <label class="lbl">내 이름 <span style="color:#f08080;font-size:8px;letter-spacing:1px;margin-left:6px">입력 후 입장하세요</span></label>
+    <input class="inp" id="joinName" placeholder="닉네임을 입력하세요..." maxlength="10">
 
     <!-- 방 목록 -->
     <div class="rl-header">
@@ -510,9 +508,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   <!-- 상단 로그바 -->
   <div class="log-bar">
     <div class="log-bar-inner" id="logBarInner"></div>
-    <div class="log-bar-right">
-      <div class="log-cnt" id="logBarCnt">0건</div>
-      <div class="log-expand" title="전체 기록 보기" onclick="openLogModal()">≡</div>
+    <div class="log-bar-footer">
+      <span class="log-cnt" id="logBarCnt">0건</span>
+      <span class="log-expand" onclick="openLogModal()">📋 전체 기록 보기</span>
     </div>
   </div>
 
